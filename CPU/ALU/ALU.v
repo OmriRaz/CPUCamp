@@ -1,12 +1,12 @@
 module ALU(
-	input						  CLK_50,
-	input			[3:0]		SW,
-	input			[1:0]		BUTTON,
-	output		[6:0]		HEX0,
-	output		[6:0]		HEX1,
-	output		[6:0]		HEX2,
-	output		[7:0]		LED,
-	inout			[35:0]	GPIO
+	input		CLK_50,
+	input	[3:0]	SW,
+	input	[1:0]	BUTTON,
+	output	[6:0]	HEX0,
+	output	[6:0]	HEX1,
+	output	[6:0]	HEX2,
+	output	[7:0]	LED,
+	inout	[35:0]	GPIO
 );
 
 reg [7:0] result;
@@ -20,7 +20,7 @@ assign invLED  = result; // assign LEDs to result
 assign op = invSW; // assign operation to position of switches
 
 //=================================//
-// 			      Inverting				     //
+// 	     Inverting		   //
 //=================================//
 wire [3:0] invSW;
 wire [7:0] invLED;
@@ -28,7 +28,7 @@ assign LED = ~invLED;
 assign invSW[3:0] = ~SW[3:0];
   
 //================================//
-//		  Operation Selection		    //
+//      Operation Selection       //
 //================================//
 always @(posedge CLK_50) begin
 	case(op)
