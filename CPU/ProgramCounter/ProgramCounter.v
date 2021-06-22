@@ -1,6 +1,6 @@
 
 module ProgramCounter(
-	input			CLK_50,
+	input			 CLK_50,
 	input	[3:0]	SW,
 	input	[1:0]	BUTTON,
 	output	[6:0]	HEX0,
