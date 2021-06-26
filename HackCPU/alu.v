@@ -1,10 +1,10 @@
 
 module alu(
-    x,
-    y,
-    out,
-    fn,
-    zero
+    x,    // D input
+    y,    //A / M input (A register or RAM)
+    out,  //Output Data
+    fn,   //Function input (instruction)
+    zero  //Zero Flag output
 );
 
 input[15:0] x, y;
