@@ -1,12 +1,11 @@
 
 module alu(
-	x,
-	y,
-	out,
-	fn,
-	zero
+    x,
+    y,
+    out,
+    fn,
+    zero
 );
-
 
 input[15:0] x, y;
 input[5:0] fn;
@@ -26,8 +25,8 @@ wire[15:0] x1 = nx ? ~x0 : x0;  //if nx is true invert x0
 wire[15:0] y1 = ny ? ~y0 : y0;  //if ny is true invert y0
 wire[15:0] out0 = add ? x1 + y1 : x1 & y1; // if add is true sum x1 and y1
 
-assign out = no ? ~out0 : out0;
-assign zero = ~|out;
+assign out = no ? ~out0 : out0; //if invert bit is enabled, assign out to inverted data
+assign zero = ~|out; //NOR the output to check if the data is equal to zero
 
 
 
