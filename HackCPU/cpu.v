@@ -1,21 +1,19 @@
 module CPU(
-
-	input 		      MAX10_CLK1_50,
-	output	[7:0]		HEX0,
-	output	[7:0]		HEX1,
-	output	[7:0]		HEX2,
-	output	[7:0]		HEX3,
-	output	[7:0]		HEX4,
-	output	[7:0]		HEX5,
-	input 	[1:0]		KEY,
-	output	[9:0]		LEDR,
-	input 	[9:0]		SW,
-	inout 	[35:0]	GPIO
+input 		MAX10_CLK1_50,
+output	[7:0]	HEX0,
+output	[7:0]	HEX1,
+output	[7:0]	HEX2,
+output	[7:0]	HEX3,
+output	[7:0]	HEX4,
+output	[7:0]	HEX5,
+input 	[1:0]	KEY,
+output	[9:0]	LEDR,
+input 	[9:0]	SW,
+inout 	[35:0]	GPIO
 );
 
 
 wire CPUclk = MAX10_CLK1_50;
-
 assign LEDR[9:0] = alu_out[9:0]; //assign the first 10 bits of the result to the LEDs
 assign nrst = ~KEY[0]; //assign CPU reset to the KEY0 button on the DE10 Lite
 assign alu_fn[5:0] = SW[5:0]; //assign the function selection of the ALU to the 6 switches on the DE10 Lite
@@ -42,7 +40,6 @@ alu alu0(
   .zero(zero)
 ); 
 
-
 wire load_a = 0;//!inst[15] || inst[5];
 wire load_d = 0;//inst[15] && inst[4];
 wire sel_a = inst[15];
@@ -60,7 +57,6 @@ wire[15:0] alu_out;
 wire[5:0] alu_fn;//= inst[11:6]; //function for the ALU 
 wire[15:0] m = rdata;
 
-
 assign inst_addr = pc;
 assign data_addr = a[14:0];
 assign wdata = alu_out;
@@ -69,18 +65,17 @@ assign we = inst[15] && inst[3];
 
 always @(posedge CPUclk)
 if (!nrst)
-	pc <= 15'b0;
+    pc <= 15'b0;
 else
-	pc <= next_pc;
+    pc <= next_pc;
 
 
 always @(posedge CPUclk)
 if (load_a)
-	a <= next_a;
+    a <= next_a;
 
 always @(posedge CPUclk)
 if (load_d)
-	d <= next_d;
-
+    d <= next_d;
 
 endmodule
