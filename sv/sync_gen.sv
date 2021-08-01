@@ -2,7 +2,7 @@ module sync_gen(
         input 				clk,
         output 				vga_h_sync,
         output 				vga_v_sync,
-        output reg 		InDisplayArea,
+        output reg 		inDisplayArea,
         output reg [9:0] CounterX,
         output reg [9:0] CounterY
     );
@@ -55,13 +55,13 @@ module sync_gen(
 
     always @(posedge clkdiv)
     begin
-        h_sync <= (CounterX > (640 + 16) && (CounterX < (640 + 16 + 96)));   // active for 96 clocks
-        v_sync <= (CounterY > (480 + 10) && (CounterY < (480 + 10 + 2)));   // active for 2 clocks
+        h_sync <= (CounterX >= (640 + 16) && (CounterX < (640 + 16 + 96)));   // active for 96 clocks
+        v_sync <= (CounterY >= (480 + 10) && (CounterY < (480 + 10 + 2)));   // active for 2 clocks
     end
 
     always @(posedge clkdiv)
     begin
-        InDisplayArea <= (CounterX < 640) && (CounterY < 480);
+        inDisplayArea <= (CounterX < 640) && (CounterY < 480);
     end
 
     assign vga_h_sync = ~h_sync;
