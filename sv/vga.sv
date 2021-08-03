@@ -1,6 +1,6 @@
 module vga(
         input logic    CLK_50,
-        input logic  [15:0] pixel_in,
+        input logic  [RAM_WIDTH-1:0] pixel_in,
         input logic [3:0]  SW,
 
         output logic [2:0] RED,
@@ -12,16 +12,13 @@ module vga(
         output logic [9:0] pixel_y
     );
 
+    parameter RAM_WIDTH;
+    parameter BITS_PER_MEMORY_PIXEL_X;
+    parameter BITS_PER_MEMORY_PIXEL_Y;
+
+    localparam PIXELS_PER_WORD = 2**($clog2(RAM_WIDTH)+BITS_PER_MEMORY_PIXEL_X);
+
     logic inDisplayArea;
-    // logic [2:0] R_val = 3'b000;
-    // logic [2:0] G_val = 3'b000;
-    // logic [1:0] B_val = 2'b00;
-
-
-    // assign RED[2:0] = R_val[2:0];
-    // assign GREEN[2:0] = G_val[2:0];
-    // assign BLUE[1:0] = B_val[1:0];
-
 
     sync_gen sync_inst(
                  .clk(CLK_50),
@@ -33,24 +30,6 @@ module vga(
              );
 
 
-
-    //=============================//
-    //  Clock Divider         //
-    //=============================//
-
-    reg [32:0] counter = 0;
-    reg state = 0;
-
-    always_ff @ (posedge CLK_50)
-    begin
-        counter <= counter + 1;
-        if(counter == 50000)
-        begin
-            state <= ~state;
-            counter <= 0;
-        end
-    end
-
     //==========================//
 
 
@@ -58,63 +37,65 @@ module vga(
     begin
         if (inDisplayArea)
         begin
-            GREEN[2:0] <= 3'b101;
-            BLUE[1:0] <= 2'b11;
-            if(SW[0])
-                RED[2:0] <= 3'b100;
+            if (SW[0])
+            begin
+                RED   <= 3'b111;
+                GREEN <= 3'b000;
+                BLUE  <= 2'b00;
+            end
             else
-                RED[2:0] <= 3'b000;
+            begin
+                // off pixel
+                RED   <= 3'b001;
+                GREEN <= 3'b001;
+                BLUE  <= 2'b01;
 
-            // if(SW[0])
-            //     R_val[2:0] = 3'b111;
-            // else
-            //     R_val[2:0] = 3'b000;
+                // on pixel
+                if (pixel_in[(PIXELS_PER_WORD - (pixel_x % PIXELS_PER_WORD)) >> BITS_PER_MEMORY_PIXEL_X])
+                begin
+                    RED   <= 3'b111;
+                    GREEN <= 3'b111;
+                    BLUE  <= 2'b11;
+                end
 
-            // if(SW[1])
-            //     G_val[2:0] = 3'b111;
-            // else
-            //     G_val[2:0] = 3'b000;
+                // pixel border
+                if (((pixel_x % (2**BITS_PER_MEMORY_PIXEL_X)) == 0) || ((pixel_y % (2**BITS_PER_MEMORY_PIXEL_Y)) == 0))
+                begin
+                    RED   <= 3'b111;
+                    GREEN <= 3'b000;
+                    BLUE  <= 2'b00;
+                end
 
-            // if(SW[2])
-            //     B_val[1:0] = 2'b11;
-            // else
-            //     B_val[1:0] = 2'b00;
+                // byte border
+                if ((pixel_x % (2**(BITS_PER_MEMORY_PIXEL_X+3))) == 0)
+                begin
+                    RED   <= 3'b000;
+                    GREEN <= 3'b000;
+                    BLUE  <= 2'b01;
+                end
 
-            // if(SW[3])
-            // begin
-            //     if(((pixel_x > 0) & (pixel_x < 213)))
-            //         R_val[2:0] = 3'b011;
-            //     else if((pixel_x > 212) & (pixel_x < 426))
-            //         G_val[2:0] = 3'b111;
-            //     else if(((pixel_x > 425) & (pixel_x < 640)))
-            //         B_val[1:0] = 2'b11;
-            // end
+                // word border
+                if ((pixel_x % (2**(BITS_PER_MEMORY_PIXEL_X+4))) == 0)
+                begin
+                    RED   <= 3'b000;
+                    GREEN <= 3'b000;
+                    BLUE  <= 2'b11;
+                end
 
-            // if(SW[0])
-            // begin
-            //     R_val[2:0] = 3'b111;
-            //     G_val[2:0] = 3'b111;
-            //     B_val[1:0] = 2'b11;
-            // end
-            // else
-            // begin
-            //     R_val[2:0] = 3'b000;
-            //     G_val[2:0] = 3'b000;
-            //     B_val[1:0] = 2'b00;
-            // end
-
-            // R_val = pixel_in[pixel_x%16] * 7;
-            // G_val = pixel_in[pixel_x%16] * 7;
-            // B_val = pixel_in[pixel_x%16] * 3;
+                // out of boundary
+                if ((pixel_x >= 512) || (pixel_y >= 384))
+                begin
+                    RED   <= 3'b000;
+                    GREEN <= 3'b001;
+                    BLUE  <= 2'b00;
+                end
+            end
         end
         else
         begin
-            // R_val[2:0] = 3'b000;
-            // G_val[2:0] = 3'b000;
-            // B_val[1:0] = 2'b00;
-            RED[2:0] <= 3'b000;
-            GREEN[2:0] <= 3'b000;
-            BLUE[1:0] <= 2'b00;
+            RED   <= 3'b000;
+            GREEN <= 3'b000;
+            BLUE  <= 2'b00;
         end
 
     end

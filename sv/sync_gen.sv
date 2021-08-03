@@ -40,7 +40,7 @@ module sync_gen(
         if (CounterXmaxed)
             CounterX <= 0;
         else
-            CounterX <= CounterX + 1;
+            CounterX <= CounterX + 1'b1;
 
     always @(posedge clkdiv)
     begin
@@ -49,7 +49,7 @@ module sync_gen(
             if(CounterYmaxed)
                 CounterY <= 0;
             else
-                CounterY <= CounterY + 1;
+                CounterY <= CounterY + 1'b1;
         end
     end
 
