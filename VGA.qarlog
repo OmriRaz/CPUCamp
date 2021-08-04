@@ -1,0 +1,23 @@
+Quartus Prime Archive log --	C:/Users/gayuh/OneDrive - Technion/CPU Garage/VGA_new/VGA.qarlog
+
+Archive:	C:/Users/gayuh/OneDrive - Technion/CPU Garage/VGA_new/VGA.qar
+Date:		Tue Aug 03 22:43:14 2021
+Quartus Prime		20.1.1 Build 720 11/11/2020 SJ Lite Edition
+
+	=========== Files Selected: ===========
+C:/Users/gayuh/OneDrive - Technion/CPU Garage/VGA_new/VGA.qpf
+C:/Users/gayuh/OneDrive - Technion/CPU Garage/VGA_new/VGA.qsf
+C:/Users/gayuh/OneDrive - Technion/CPU Garage/VGA_new/assignment_defaults.qdf
+C:/Users/gayuh/OneDrive - Technion/CPU Garage/VGA_new/db/stp1_auto_stripped.stp
+C:/Users/gayuh/OneDrive - Technion/CPU Garage/VGA_new/output_files/Chain1.cdf
+C:/Users/gayuh/OneDrive - Technion/CPU Garage/VGA_new/output_files/stp1.stp
+C:/Users/gayuh/OneDrive - Technion/CPU Garage/VGA_new/sv/alu.sv
+C:/Users/gayuh/OneDrive - Technion/CPU Garage/VGA_new/sv/cpu.sv
+C:/Users/gayuh/OneDrive - Technion/CPU Garage/VGA_new/sv/ram.sv
+C:/Users/gayuh/OneDrive - Technion/CPU Garage/VGA_new/sv/sync_gen.sv
+C:/Users/gayuh/OneDrive - Technion/CPU Garage/VGA_new/sv/top.sv
+C:/Users/gayuh/OneDrive - Technion/CPU Garage/VGA_new/sv/vga.sv
+	======= Total: 12 files to archive =======
+
+	================ Status: ===============
+All files archived successfully.
