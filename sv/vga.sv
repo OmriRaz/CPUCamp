@@ -1,7 +1,9 @@
 module vga(
-        input logic    CLK_50,
-        input logic  [RAM_WIDTH-1:0] pixel_in,
+        input logic CLK_50,
+        input logic [RAM_WIDTH-1:0] pixel_in,
         input logic [3:0]  SW,
+        input logic number_drawing_request,
+        input logic [7:0]  number_rgb,
 
         output logic [2:0] RED,
         output logic [2:0] GREEN,
@@ -85,9 +87,18 @@ module vga(
                 // out of boundary
                 if ((pixel_x >= 512) || (pixel_y >= 384))
                 begin
-                    RED   <= 3'b000;
-                    GREEN <= 3'b001;
-                    BLUE  <= 2'b00;
+                    if (number_drawing_request)
+                    begin
+                        RED   <= number_rgb[7:5];
+                        GREEN <= number_rgb[4:2];
+                        BLUE  <= number_rgb[1:0];
+                    end
+                    else
+                    begin
+                        RED   <= 3'b000;
+                        GREEN <= 3'b001;
+                        BLUE  <= 2'b00;
+                    end
                 end
             end
         end

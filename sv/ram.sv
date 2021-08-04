@@ -18,6 +18,7 @@ module ram(
     parameter BITS_PER_MEMORY_PIXEL_Y;
 
     localparam WORDS_PER_LINE = (2**9) >> ($clog2(WIDTH)+BITS_PER_MEMORY_PIXEL_X);
+    localparam PIXELS_PER_WORD = 2**($clog2(WIDTH)+BITS_PER_MEMORY_PIXEL_X);
 
     logic [WIDTH-1:0] memory [0:REGISTER_COUNT-1];
 
@@ -33,28 +34,28 @@ module ram(
         memory[RAM_SCREEN_OFFSET + 2] = 16'h00F0;
         memory[RAM_SCREEN_OFFSET + 3] = 16'h0010;
         memory[RAM_SCREEN_OFFSET + 4] = 16'h000F;
+        memory[RAM_SCREEN_OFFSET + 5] = 16'hCAFE;
+        memory[RAM_SCREEN_OFFSET + 6] = 16'hBABE;
+        memory[RAM_SCREEN_OFFSET + 7] = 16'hDEAD;
+        memory[RAM_SCREEN_OFFSET + 8] = 16'hBEEF;
     end
 
     always_ff @(posedge CPUclk)
     begin
-        // if (SW[0])
-        // begin
-        //     memory[RAM_SCREEN_OFFSET + 7] <= 16'b1111_1111_1111_1111;
-        //     // memory[RAM_SCREEN_OFFSET] <= 16'b1010_1010_1010_1010;
-        // end
-        // if (SW[1])
-        // begin
-        //     memory[RAM_SCREEN_OFFSET + 7] <= 16'b0000_0000_0000_0000;
-        // end
+        if (we)
+        begin
+            memory[addr] <= wdata;
+            rdata <= wdata;
+        end
+        else
+            rdata <= memory[addr];
+    end
 
-        // if (we)
-        //     memory[addr] <= wdata;
-        // rdata <= memory[addr];
-
-        pixel_out <= memory[RAM_SCREEN_OFFSET + ((pixel_y>>BITS_PER_MEMORY_PIXEL_Y)*WORDS_PER_LINE) + (pixel_x >> ($clog2(WIDTH)+BITS_PER_MEMORY_PIXEL_X))];
-        // pixel_out <= memory[RAM_SCREEN_OFFSET];
-        // pixel_out <= 16'hFFFF;
-
+    always_ff @(posedge CPUclk)
+    begin
+        pixel_out <= memory[RAM_SCREEN_OFFSET
+                            + (pixel_y >> BITS_PER_MEMORY_PIXEL_Y) * WORDS_PER_LINE
+                            + ((pixel_x % 512) / PIXELS_PER_WORD)];
     end
 
 endmodule

@@ -12,11 +12,11 @@ module numbers_bitmap (
         input  logic InsideRectangle, //input that the pixel is within a bracket
         input  logic [3:0] digit, // digit to display
 
-        output logic    drawingRequest, //output that the pixel should be dispalyed
+        output logic drawingRequest, //output that the pixel should be dispalyed
         output logic [7:0]  RGBout
     );
 
-    parameter  logic [7:0] digit_color = 8'h0 ; //set the color of the digit
+    parameter  logic [7:0] digit_color = 8'b111_111_11 ; //set the color of the digit
 
 
     bit [0:15] [0:31] [0:15] number_bitmap  = {
@@ -569,7 +569,7 @@ module numbers_bitmap (
         end
         else
         begin
-            drawingRequest <= (number_bitmap[digit][offsetY][offsetX]) && (InsideRectangle == 1'b1 ); //get value from bitmap
+            drawingRequest <= (number_bitmap[digit][offsetY][offsetX]) && (InsideRectangle == 1'b1); //get value from bitmap
         end
     end
 
