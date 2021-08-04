@@ -4,8 +4,6 @@ module ram(
         input logic [WIDTH-1:0] wdata,  //Write Data to RAM
         input logic we,      //Write Enable
 
-        input logic [3:0] SW, //temp
-
         input logic [9:0] pixel_x,
         input logic [9:0] pixel_y,
 
@@ -29,15 +27,17 @@ module ram(
         // begin
         //     memory[i] = 16'hF00F;
         // end
-        memory[RAM_SCREEN_OFFSET + 0] = 16'hF000;
-        memory[RAM_SCREEN_OFFSET + 1] = 16'h0F00;
-        memory[RAM_SCREEN_OFFSET + 2] = 16'h00F0;
-        memory[RAM_SCREEN_OFFSET + 3] = 16'h0010;
-        memory[RAM_SCREEN_OFFSET + 4] = 16'h000F;
-        memory[RAM_SCREEN_OFFSET + 5] = 16'hCAFE;
-        memory[RAM_SCREEN_OFFSET + 6] = 16'hBABE;
-        memory[RAM_SCREEN_OFFSET + 7] = 16'hDEAD;
-        memory[RAM_SCREEN_OFFSET + 8] = 16'hBEEF;
+        memory[RAM_SCREEN_OFFSET + 0]  = 16'hF000;
+        memory[RAM_SCREEN_OFFSET + 1]  = 16'h0F00;
+        memory[RAM_SCREEN_OFFSET + 2]  = 16'h00F0;
+        memory[RAM_SCREEN_OFFSET + 3]  = 16'h0010;
+        memory[RAM_SCREEN_OFFSET + 4]  = 16'h000F;
+        memory[RAM_SCREEN_OFFSET + 5]  = 16'h0000;
+        memory[RAM_SCREEN_OFFSET + 6]  = 16'b1001011101110111;
+        memory[RAM_SCREEN_OFFSET + 7]  = 16'b1101001001000100;
+        memory[RAM_SCREEN_OFFSET + 8]  = 16'b1011001001000110;
+        memory[RAM_SCREEN_OFFSET + 9]  = 16'b1001001001000100;
+        memory[RAM_SCREEN_OFFSET + 10] = 16'b1001011101110111;
     end
 
     always_ff @(posedge CPUclk)
