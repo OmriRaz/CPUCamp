@@ -7,10 +7,19 @@ module top(
         output      h_sync,
         output    v_sync
     );
-    parameter BITS_PER_MEMORY_PIXEL_X = 5;
-    parameter BITS_PER_MEMORY_PIXEL_Y = 5;
     parameter RAM_WIDTH = 16, RAM_REGISTER_COUNT = 2**8, RAM_SCREEN_OFFSET = 0;
-    parameter HEX_START_X = 528;
+
+    parameter BITS_PER_MEMORY_PIXEL_X = 4;
+    parameter BITS_PER_MEMORY_PIXEL_Y = 5;
+    parameter HEX_START_X = 512;
+    parameter PIXELS_PER_HEX_DIGIT = 16;
+
+    localparam HEX_DIGITS_PER_LINE = BITS_PER_MEMORY_PIXEL_X <= 4 ? 8 : 4;
+    localparam WORDS_PER_LINE = (2**9) >> ($clog2(RAM_WIDTH)+BITS_PER_MEMORY_PIXEL_X);
+    localparam PIXELS_PER_WORD = 2**($clog2(RAM_WIDTH)+BITS_PER_MEMORY_PIXEL_X);
+    localparam BITS_PER_HEX_DIGIT = 4;
+    localparam WORDS_PER_HEX_LINE = BITS_PER_HEX_DIGIT * HEX_DIGITS_PER_LINE / RAM_WIDTH;
+    localparam HEX_PIXELS_PER_WORD = RAM_WIDTH / BITS_PER_HEX_DIGIT * PIXELS_PER_HEX_DIGIT;
 
     logic [$clog2(RAM_REGISTER_COUNT)-1:0] addr;
     logic we;
@@ -23,31 +32,44 @@ module top(
     logic [9:0] pixel_y;
     logic [RAM_WIDTH-1:0] pixel_value;
 
-    ram #(.WIDTH(RAM_WIDTH), .REGISTER_COUNT(RAM_REGISTER_COUNT), .RAM_SCREEN_OFFSET(RAM_SCREEN_OFFSET),
-          .BITS_PER_MEMORY_PIXEL_X(BITS_PER_MEMORY_PIXEL_X), .BITS_PER_MEMORY_PIXEL_Y(BITS_PER_MEMORY_PIXEL_Y))
+    logic [RAM_WIDTH-1:0] pixel_address;
+    always_comb
+    begin
+        // Binary
+        if (pixel_x < HEX_START_X)
+            pixel_address = RAM_WIDTH'((pixel_y >> BITS_PER_MEMORY_PIXEL_Y) * WORDS_PER_LINE
+                                       + (pixel_x / PIXELS_PER_WORD));
+        // HEX
+        else
+            pixel_address = RAM_WIDTH'((pixel_y >> BITS_PER_MEMORY_PIXEL_Y) * WORDS_PER_HEX_LINE
+                                       + ((pixel_x - HEX_START_X) / HEX_PIXELS_PER_WORD));
+    end
+
+    ram #(.WIDTH(RAM_WIDTH), .REGISTER_COUNT(RAM_REGISTER_COUNT), .RAM_SCREEN_OFFSET(RAM_SCREEN_OFFSET))
         ram_data(.CPUclk(CLK_50),
                  .addr(addr),
                  .rdata(rdata),
                  //  .wdata(wdata),
-                 .pixel_x(pixel_x),
-                 .pixel_y(pixel_y),
                  .we(we),
-                 .pixel_out(pixel_value)
+                 .addr_screen(pixel_address),
+                 .rdata_screen(pixel_value)
                 );
 
-    vga #(.RAM_WIDTH(RAM_WIDTH), .BITS_PER_MEMORY_PIXEL_X(BITS_PER_MEMORY_PIXEL_X), .BITS_PER_MEMORY_PIXEL_Y(BITS_PER_MEMORY_PIXEL_Y))
+    vga #(.RAM_WIDTH(RAM_WIDTH), .BITS_PER_MEMORY_PIXEL_X(BITS_PER_MEMORY_PIXEL_X), .BITS_PER_MEMORY_PIXEL_Y(BITS_PER_MEMORY_PIXEL_Y),
+          .HEX_START_X(HEX_START_X), .PIXELS_PER_HEX_DIGIT(PIXELS_PER_HEX_DIGIT))
         vga_inst(.CLK_50(CLK_50),
                  .number_drawing_request(number_drawing_request),
                  .number_rgb(number_rgb),
                  .SW(SW), //temp
+                 .pixel_in(pixel_value),
+
                  .RED(RED),
                  .GREEN(GREEN),
                  .BLUE(BLUE),
                  .h_sync(h_sync),
                  .v_sync(v_sync),
                  .pixel_x(pixel_x),
-                 .pixel_y(pixel_y),
-                 .pixel_in(pixel_value)
+                 .pixel_y(pixel_y)
                 );
 
     logic [9:0] offsetX;
@@ -58,19 +80,17 @@ module top(
     logic [7:0] current_nibble;
     always_comb
     begin
-        if (pixel_x < HEX_START_X+16*1)
+        if ((pixel_x - HEX_START_X) % HEX_PIXELS_PER_WORD < 16*1)
             current_nibble = pixel_value[15:12];
-        else if (pixel_x < HEX_START_X+16*2)
+        else if ((pixel_x - HEX_START_X) % HEX_PIXELS_PER_WORD < 16*2)
             current_nibble = pixel_value[11:8];
-        else if (pixel_x < HEX_START_X+16*3)
+        else if ((pixel_x - HEX_START_X) % HEX_PIXELS_PER_WORD < 16*3)
             current_nibble = pixel_value[7:4];
         else
             current_nibble = pixel_value[3:0];
     end
 
-    square_object #(.OBJECT_WIDTH_X(16*4), .OBJECT_HEIGHT_Y(32*12)) number_square(
-                      .clk(CLK_50),
-                      .resetN(SW[3]),
+    square_object #(.OBJECT_WIDTH_X(PIXELS_PER_HEX_DIGIT*HEX_DIGITS_PER_LINE), .OBJECT_HEIGHT_Y(32*12)) number_square(
                       .pixelX(pixel_x),// current VGA pixel
                       .pixelY(pixel_y),
                       .topLeftX(HEX_START_X), //position on the screen
@@ -81,8 +101,6 @@ module top(
                       .inside_rectangle(inside_rectangle) // indicates pixel inside the bracket
                   );
     numbers_bitmap #(.digit_color(8'b111_111_11)) number_bitmap(
-                       .clk(CLK_50),
-                       .resetN(SW[3]),
                        .offsetX(offsetX),
                        .offsetY(offsetY),
                        .InsideRectangle(inside_rectangle),

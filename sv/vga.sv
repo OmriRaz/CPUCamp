@@ -17,6 +17,8 @@ module vga(
     parameter RAM_WIDTH;
     parameter BITS_PER_MEMORY_PIXEL_X;
     parameter BITS_PER_MEMORY_PIXEL_Y;
+    parameter HEX_START_X;
+    parameter PIXELS_PER_HEX_DIGIT;
 
     localparam PIXELS_PER_WORD = 2**($clog2(RAM_WIDTH)+BITS_PER_MEMORY_PIXEL_X);
 
@@ -85,19 +87,35 @@ module vga(
                 end
 
                 // out of boundary
-                if ((pixel_x >= 512) || (pixel_y >= 384))
+                if ((pixel_x >= HEX_START_X) || (pixel_y >= 384))
                 begin
+                    // background
+                    RED   <= 3'b000;
+                    GREEN <= 3'b001;
+                    BLUE  <= 2'b00;
+
+                    // number
                     if (number_drawing_request)
                     begin
                         RED   <= number_rgb[7:5];
                         GREEN <= number_rgb[4:2];
                         BLUE  <= number_rgb[1:0];
                     end
-                    else
+
+                    // byte border (2 hex digits)
+                    if ((pixel_x - HEX_START_X) % (2*PIXELS_PER_HEX_DIGIT) == 0 && pixel_y < 384)
                     begin
                         RED   <= 3'b000;
-                        GREEN <= 3'b001;
-                        BLUE  <= 2'b00;
+                        GREEN <= 3'b000;
+                        BLUE  <= 2'b01;
+                    end
+
+                    // word border (4 hex digits)
+                    if ((pixel_x - HEX_START_X) % (4*PIXELS_PER_HEX_DIGIT) == 0 && pixel_y < 384)
+                    begin
+                        RED   <= 3'b000;
+                        GREEN <= 3'b000;
+                        BLUE  <= 2'b11;
                     end
                 end
             end

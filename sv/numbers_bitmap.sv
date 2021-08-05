@@ -5,8 +5,6 @@
 // edited by Guy Shapira August 2021
 
 module numbers_bitmap (
-        input  logic clk,
-        input  logic resetN,
         input  logic [10:0] offsetX,// offset from top left  position
         input  logic [10:0] offsetY,
         input  logic InsideRectangle, //input that the pixel is within a bracket
@@ -559,18 +557,15 @@ module numbers_bitmap (
 
 
 
-    // pipeline (ff) to get the pixel color from the array
 
-    always_ff@(posedge clk or negedge resetN)
+
+
+    always_comb
     begin
-        if(!resetN)
-        begin
-            drawingRequest <= 1'b0;
-        end
-        else
-        begin
-            drawingRequest <= (number_bitmap[digit][offsetY][offsetX]) && (InsideRectangle == 1'b1); //get value from bitmap
-        end
+        drawingRequest = (number_bitmap[digit][offsetY][offsetX]) && (InsideRectangle == 1'b1); //get value from bitmap
+        // I excluded a 1-pixel border on purpose
+        drawingRequest = drawingRequest && (offsetY != 0) && (offsetY != 31);
+        drawingRequest = drawingRequest && (offsetX != 0) && (offsetX != 15);
     end
 
     assign RGBout = digit_color ; // this is a fixed color

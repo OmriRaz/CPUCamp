@@ -6,8 +6,6 @@
 // edited by Guy Shapira August 2021
 
 module square_object (
-        input  logic clk,
-        input  logic resetN,
         input  logic [10:0] pixelX,// current VGA pixel
         input  logic [10:0] pixelY,
         input  logic signed [10:0] topLeftX, //position on the screen
@@ -30,28 +28,22 @@ module square_object (
     assign bottomY = (topLeftY + OBJECT_HEIGHT_Y);
 
     //==----------------------------------------------------------------------------------------------------------------=
-    always_ff@(posedge clk or negedge resetN)
+    always_comb
     begin
-        if(!resetN)
+        insideY = (pixelY >= topLeftY) && (pixelY < bottomY);
+        insideX = (pixelX >= topLeftX) && (pixelX < rightX);
+        if (insideX && insideY) // test if it is inside the rectangle
         begin
-            inside_rectangle <= 1'b0;
+            inside_rectangle = 1'b1 ;
+            // 16 and 32 are the width and height of the number bitmap, respectively.
+            offsetX = (pixelX - topLeftX) % 11'd16; //calculate relative offsets from top left corner
+            offsetY = (pixelY - topLeftY) % 11'd32;
         end
         else
         begin
-            insideY = (pixelY >= topLeftY) && (pixelY < bottomY);
-            insideX = (pixelX >= topLeftX) && (pixelX < rightX);
-            if (insideX && insideY) // test if it is inside the rectangle
-            begin
-                inside_rectangle <= 1'b1 ;
-                offsetX <= (pixelX - topLeftX); //calculate relative offsets from top left corner
-                offsetY <= (pixelY - topLeftY);
-            end
-            else
-            begin
-                inside_rectangle <= 1'b0 ;// transparent color
-                offsetX <= 0; //no offset
-                offsetY <= 0; //no offset
-            end
+            inside_rectangle = 1'b0 ;
+            offsetX = 0; //no offset
+            offsetY = 0; //no offset
         end
     end
 endmodule
