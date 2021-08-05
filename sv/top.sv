@@ -47,6 +47,7 @@ module top(
 
     ram #(.WIDTH(RAM_WIDTH), .REGISTER_COUNT(RAM_REGISTER_COUNT), .RAM_SCREEN_OFFSET(RAM_SCREEN_OFFSET))
         ram_data(.CPUclk(CLK_50),
+                 .CLK_50(CLK_50),
                  .addr(addr),
                  .rdata(rdata),
                  //  .wdata(wdata),

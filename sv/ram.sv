@@ -1,5 +1,6 @@
 module ram(
         input logic CPUclk, //CPU clock input (default 50MHz)
+        input logic CLK_50, //50MHz clock (for VGA)
         input logic [$clog2(REGISTER_COUNT)-1:0] addr,   //RAM address input
         input logic [WIDTH-1:0] wdata,  //Write Data to RAM
         input logic we,      //Write Enable
@@ -31,7 +32,7 @@ module ram(
             rdata <= memory[addr];
     end
 
-    always_ff @(posedge CPUclk)
+    always_ff @(posedge CLK_50)
     begin
         rdata_screen <= memory[RAM_SCREEN_OFFSET + addr_screen];
     end

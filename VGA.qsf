@@ -112,7 +112,6 @@ set_global_assignment -name USE_SIGNALTAP_FILE output_files/stp1.stp
 set_global_assignment -name VERILOG_INPUT_VERSION SYSTEMVERILOG_2005
 set_global_assignment -name VERILOG_SHOW_LMF_MAPPING_MESSAGES OFF
 set_global_assignment -name ALLOW_ANY_RAM_SIZE_FOR_RECOGNITION ON
-set_global_assignment -name SYSTEMVERILOG_FILE sv/ram2.sv
 set_global_assignment -name SYSTEMVERILOG_FILE sv/square_object.sv
 set_global_assignment -name SYSTEMVERILOG_FILE sv/numbers_bitmap.sv
 set_global_assignment -name SYSTEMVERILOG_FILE sv/vga.sv
