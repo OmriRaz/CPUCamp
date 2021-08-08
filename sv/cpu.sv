@@ -48,7 +48,6 @@ module cpu (
 
     always @(posedge clk)
         if (!resetN)
-
             pc <= 15'b0;
         else
             pc <= next_pc;

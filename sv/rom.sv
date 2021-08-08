@@ -14,9 +14,7 @@ module rom
     // end
 
 
-    always @ (posedge cpu_clk)
-    begin
-        q <= rom[addr];
-    end
+    assign q = rom[addr];
+
 
 endmodule

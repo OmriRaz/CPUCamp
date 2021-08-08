@@ -18,7 +18,7 @@ module ram(
 
     // initial
     // begin
-    //     $readmemh("ram.txt", memory, RAM_SCREEN_OFFSET);
+    //     $readmemh("memory/ram.txt", memory, RAM_SCREEN_OFFSET);
     // end
 
     always_ff @(posedge cpu_clk)
@@ -26,11 +26,10 @@ module ram(
         if (we)
         begin
             memory[addr] <= wdata;
-            rdata <= wdata;
         end
-        else
-            rdata <= memory[addr];
     end
+
+    assign rdata = memory[addr];
 
     always_ff @(posedge CLK_50)
     begin

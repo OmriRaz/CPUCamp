@@ -113,11 +113,21 @@ module top(
     logic [DATA_WIDTH-1:0] instruction;
     logic [DATA_WIDTH-1:0] cpu_out_m;
     logic [$clog2(ROM_REGISTER_COUNT)-1:0] inst_address;
-    // assign inst_address = 0;
-    rom2 rom_inst (.clock(CLK_50), //cpu_clk
+    assign inst_addr = 0; //for debug
+    rom3 rom_inst (.clock(CLK_50), //cpu_clk
                    .address(inst_address),
                    .q(instruction)
                   );
+
+    // ram2	ram2_inst (
+    //          .address (inst_address),
+    //          .clock (CLK_50),
+    //          .data (0),
+    //          .wren (0),
+
+    //          .q (instruction)
+    //      );
+
     // rom #(.WIDTH(DATA_WIDTH), .REGISTER_COUNT(ROM_REGISTER_COUNT))
     //     rom_inst (.cpu_clk(CLK_50),
     //               .addr(inst_address),
@@ -129,12 +139,14 @@ module top(
     //          "ENABLE_RUNTIME_MOD = YES, INSTANCE_NAME = rom_inst";
 
 
+    logic resetN;
+    assign resetN = SW[0];
     cpu cpu_inst (
             .clk(CLK_50),
             .SW(SW),
             .inst(instruction),
             .in_m(rdata),
-            .resetN(SW[0]),
+            .resetN(resetN),
 
             .out_m(cpu_out_m),
             .write_m(we),
