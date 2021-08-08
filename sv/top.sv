@@ -7,7 +7,8 @@ module top(
         output      h_sync,
         output    v_sync
     );
-    parameter RAM_WIDTH = 16, RAM_REGISTER_COUNT = 2**8, RAM_SCREEN_OFFSET = 0;
+    parameter DATA_WIDTH = 16, RAM_REGISTER_COUNT = 2**9, RAM_SCREEN_OFFSET = 0;
+    parameter ROM_REGISTER_COUNT = 2**8;
 
     parameter BITS_PER_MEMORY_PIXEL_X = 4;
     parameter BITS_PER_MEMORY_PIXEL_Y = 5;
@@ -15,48 +16,45 @@ module top(
     parameter PIXELS_PER_HEX_DIGIT = 16;
 
     localparam HEX_DIGITS_PER_LINE = BITS_PER_MEMORY_PIXEL_X <= 4 ? 8 : 4;
-    localparam WORDS_PER_LINE = (2**9) >> ($clog2(RAM_WIDTH)+BITS_PER_MEMORY_PIXEL_X);
-    localparam PIXELS_PER_WORD = 2**($clog2(RAM_WIDTH)+BITS_PER_MEMORY_PIXEL_X);
+    localparam WORDS_PER_LINE = (2**9) >> ($clog2(DATA_WIDTH)+BITS_PER_MEMORY_PIXEL_X);
+    localparam PIXELS_PER_WORD = 2**($clog2(DATA_WIDTH)+BITS_PER_MEMORY_PIXEL_X);
     localparam BITS_PER_HEX_DIGIT = 4;
-    localparam WORDS_PER_HEX_LINE = BITS_PER_HEX_DIGIT * HEX_DIGITS_PER_LINE / RAM_WIDTH;
-    localparam HEX_PIXELS_PER_WORD = RAM_WIDTH / BITS_PER_HEX_DIGIT * PIXELS_PER_HEX_DIGIT;
+    localparam WORDS_PER_HEX_LINE = BITS_PER_HEX_DIGIT * HEX_DIGITS_PER_LINE / DATA_WIDTH;
+    localparam HEX_PIXELS_PER_WORD = DATA_WIDTH / BITS_PER_HEX_DIGIT * PIXELS_PER_HEX_DIGIT;
 
-    logic [$clog2(RAM_REGISTER_COUNT)-1:0] addr;
+    logic [$clog2(RAM_REGISTER_COUNT)-1:0] ram_address;
     logic we;
-    logic [RAM_WIDTH-1:0] rdata;
-
-    assign addr = 0;
-    assign we = 0;
+    logic [DATA_WIDTH-1:0] rdata;
 
     logic [9:0] pixel_x;
     logic [9:0] pixel_y;
-    logic [RAM_WIDTH-1:0] pixel_value;
+    logic [DATA_WIDTH-1:0] pixel_value;
 
-    logic [RAM_WIDTH-1:0] pixel_address;
+    logic [DATA_WIDTH-1:0] pixel_address;
     always_comb
     begin
         // Binary
         if (pixel_x < HEX_START_X)
-            pixel_address = RAM_WIDTH'((pixel_y >> BITS_PER_MEMORY_PIXEL_Y) * WORDS_PER_LINE
-                                       + (pixel_x / PIXELS_PER_WORD));
+            pixel_address = DATA_WIDTH'((pixel_y >> BITS_PER_MEMORY_PIXEL_Y) * WORDS_PER_LINE
+                                        + (pixel_x / PIXELS_PER_WORD));
         // HEX
         else
-            pixel_address = RAM_WIDTH'((pixel_y >> BITS_PER_MEMORY_PIXEL_Y) * WORDS_PER_HEX_LINE
-                                       + ((pixel_x - HEX_START_X) / HEX_PIXELS_PER_WORD));
+            pixel_address = DATA_WIDTH'((pixel_y >> BITS_PER_MEMORY_PIXEL_Y) * WORDS_PER_HEX_LINE
+                                        + ((pixel_x - HEX_START_X) / HEX_PIXELS_PER_WORD));
     end
 
-    ram #(.WIDTH(RAM_WIDTH), .REGISTER_COUNT(RAM_REGISTER_COUNT), .RAM_SCREEN_OFFSET(RAM_SCREEN_OFFSET))
-        ram_data(.CPUclk(CLK_50),
+    ram #(.WIDTH(DATA_WIDTH), .REGISTER_COUNT(RAM_REGISTER_COUNT), .RAM_SCREEN_OFFSET(RAM_SCREEN_OFFSET))
+        ram_data(.cpu_clk(CLK_50),
                  .CLK_50(CLK_50),
-                 .addr(addr),
+                 .addr(ram_address),
                  .rdata(rdata),
-                 //  .wdata(wdata),
+                 .wdata(cpu_out_m),
                  .we(we),
                  .addr_screen(pixel_address),
                  .rdata_screen(pixel_value)
                 );
 
-    vga #(.RAM_WIDTH(RAM_WIDTH), .BITS_PER_MEMORY_PIXEL_X(BITS_PER_MEMORY_PIXEL_X), .BITS_PER_MEMORY_PIXEL_Y(BITS_PER_MEMORY_PIXEL_Y),
+    vga #(.DATA_WIDTH(DATA_WIDTH), .BITS_PER_MEMORY_PIXEL_X(BITS_PER_MEMORY_PIXEL_X), .BITS_PER_MEMORY_PIXEL_Y(BITS_PER_MEMORY_PIXEL_Y),
           .HEX_START_X(HEX_START_X), .PIXELS_PER_HEX_DIGIT(PIXELS_PER_HEX_DIGIT))
         vga_inst(.CLK_50(CLK_50),
                  .number_drawing_request(number_drawing_request),
@@ -111,4 +109,36 @@ module top(
                        .RGBout(number_rgb)
                    );
 
+
+    logic [DATA_WIDTH-1:0] instruction;
+    logic [DATA_WIDTH-1:0] cpu_out_m;
+    logic [$clog2(ROM_REGISTER_COUNT)-1:0] inst_address;
+    // assign inst_address = 0;
+    rom2 rom_inst (.clock(CLK_50), //cpu_clk
+                   .address(inst_address),
+                   .q(instruction)
+                  );
+    // rom #(.WIDTH(DATA_WIDTH), .REGISTER_COUNT(ROM_REGISTER_COUNT))
+    //     rom_inst (.cpu_clk(CLK_50),
+    //               .addr(inst_address),
+    //               //   .q()
+    //               .q(instruction)
+    //              );
+
+    // defparam rom_inst.lpm_hint =
+    //          "ENABLE_RUNTIME_MOD = YES, INSTANCE_NAME = rom_inst";
+
+
+    cpu cpu_inst (
+            .clk(CLK_50),
+            .SW(SW),
+            .inst(instruction),
+            .in_m(rdata),
+            .resetN(SW[0]),
+
+            .out_m(cpu_out_m),
+            .write_m(we),
+            .data_addr(ram_address),
+            .inst_addr(inst_address)
+        );
 endmodule

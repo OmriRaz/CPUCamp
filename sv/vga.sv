@@ -1,6 +1,6 @@
 module vga(
         input logic CLK_50,
-        input logic [RAM_WIDTH-1:0] pixel_in,
+        input logic [DATA_WIDTH-1:0] pixel_in,
         input logic [3:0]  SW,
         input logic number_drawing_request,
         input logic [7:0]  number_rgb,
@@ -14,13 +14,13 @@ module vga(
         output logic [9:0] pixel_y
     );
 
-    parameter RAM_WIDTH;
+    parameter DATA_WIDTH;
     parameter BITS_PER_MEMORY_PIXEL_X;
     parameter BITS_PER_MEMORY_PIXEL_Y;
     parameter HEX_START_X;
     parameter PIXELS_PER_HEX_DIGIT;
 
-    localparam PIXELS_PER_WORD = 2**($clog2(RAM_WIDTH)+BITS_PER_MEMORY_PIXEL_X);
+    localparam PIXELS_PER_WORD = 2**($clog2(DATA_WIDTH)+BITS_PER_MEMORY_PIXEL_X);
 
     logic inDisplayArea;
 
@@ -41,7 +41,7 @@ module vga(
     begin
         if (inDisplayArea)
         begin
-            if (SW[0])
+            if (SW[3])
             begin
                 RED   <= 3'b111;
                 GREEN <= 3'b000;

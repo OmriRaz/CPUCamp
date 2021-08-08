@@ -1,6 +1,5 @@
-module CPU(
+module cpu (
         input logic         clk,
-        input logic [1:0]   KEY,
         input logic [3:0]   SW,
         input logic [15:0]  inst,
         input logic [15:0]  in_m,
@@ -13,9 +12,9 @@ module CPU(
     );
 
     //////////////////////////////////////////
-    logic [14:0] pc;
-    logic [15:0] a = 16'b0000000000000111; //test data for the ALU
-    logic [15:0] d = 16'b0000000000101110; //test data for the ALU
+    reg [14:0] pc;
+    reg [15:0] a;
+    reg [15:0] d;
 
     //ALU module instantiation
     alu alu0(
@@ -26,22 +25,22 @@ module CPU(
             .zero(zero)
         );
 
-    logic load_a = !inst[15] || inst[5];
-    logic load_d = inst[15] && inst[4];
-    logic sel_a = inst[15];
-    logic sel_am = inst[12]; //select if the ALU's Y input is from ram or from A register
-    logic jump = (less_than_zero && inst[2]) || (zero && inst[1]) || (greater_than_zero && inst[0]);
-    logic sel_pc = inst[15] && jump;
-    logic zero; //zero flag from ALU
-    logic less_than_zero = alu_out[15];
-    logic greater_than_zero = !(less_than_zero || zero);
-    logic [14:0] next_pc = sel_pc ? a[14:0] : pc + 15'b1;
-    logic [15:0] next_a = sel_a ? alu_out : {1'b0, inst[14:0]};
-    logic [15:0] next_d = alu_out;
-    logic [15:0] am = sel_am ? m : a; // decide whether the alu will use the data in memory or in the A register
-    logic [15:0] alu_out;
-    logic [5:0] alu_fn = inst[11:6]; //function for the ALU
-    logic [15:0] m = in_m;
+    wire load_a = !inst[15] || inst[5];
+    wire load_d = inst[15] && inst[4];
+    wire sel_a = inst[15];
+    wire sel_am = inst[12]; //select if the ALU's Y input is from ram or from A register
+    wire jump = (less_than_zero && inst[2]) || (zero && inst[1]) || (greater_than_zero && inst[0]);
+    wire sel_pc = inst[15] && jump;
+    wire zero; //zero flag from ALU
+    wire less_than_zero = alu_out[15];
+    wire greater_than_zero = !(less_than_zero || zero);
+    wire [14:0] next_pc = sel_pc ? a[14:0] : pc + 15'b1;
+    wire [15:0] next_a = sel_a ? alu_out : {1'b0, inst[14:0]};
+    wire [15:0] next_d = alu_out;
+    wire [15:0] am = sel_am ? m : a; // decide whether the alu will use the data in memory or in the A register
+    wire [15:0] alu_out;
+    wire [5:0] alu_fn = inst[11:6]; //function for the ALU
+    wire [15:0] m = in_m;
     assign data_addr = a[14:0];
     assign out_m = alu_out;
     assign write_m = inst[15] && inst[3];
