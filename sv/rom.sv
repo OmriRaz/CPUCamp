@@ -1,6 +1,6 @@
 module rom
     (
-        input cpu_clk,
+        // input cpu_clk,
         input [$clog2(REGISTER_COUNT)-1:0] addr,
         output reg [WIDTH-1:0] q
     );
@@ -8,10 +8,10 @@ module rom
 
     reg [WIDTH-1:0] rom [0:REGISTER_COUNT-1];
 
-    // initial
-    // begin
-    //     $readmemb("rom.txt", rom);
-    // end
+    initial
+    begin
+        $readmemb("memory/rom.txt", rom);
+    end
 
 
     assign q = rom[addr];

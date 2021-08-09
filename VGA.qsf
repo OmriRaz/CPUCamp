@@ -33,6 +33,13 @@ set_location_assignment PIN_N8 -to LED[6]
 set_location_assignment PIN_M8 -to LED[7]
 
 
+#======================
+#BUTTON
+#======================
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to BUTTON[0]
+set_location_assignment PIN_B9 -to BUTTON[0]
+
+
 
 #============================================================
 # SW
@@ -124,6 +131,4 @@ set_global_assignment -name SYSTEMVERILOG_FILE sv/cpu.sv
 set_global_assignment -name SYSTEMVERILOG_FILE sv/alu.sv
 set_global_assignment -name CDF_FILE output_files/Chain1.cdf
 set_global_assignment -name SIGNALTAP_FILE output_files/stp1.stp
-set_global_assignment -name MIF_FILE memory/rom.mif
-set_global_assignment -name QIP_FILE sv/rom3.qip
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
