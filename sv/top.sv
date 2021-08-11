@@ -10,6 +10,7 @@ module top(
     );
     parameter DATA_WIDTH = 16, RAM_REGISTER_COUNT = 2**12, RAM_SCREEN_OFFSET = 0;
     parameter ROM_REGISTER_COUNT = 2**12;
+    parameter NUMBER_OF_DIGITS_PERF = 8;
 
     parameter BITS_PER_MEMORY_PIXEL_X = 4; //4
     parameter BITS_PER_MEMORY_PIXEL_Y = 5; //5
@@ -66,8 +67,10 @@ module top(
     vga #(.DATA_WIDTH(DATA_WIDTH), .BITS_PER_MEMORY_PIXEL_X(BITS_PER_MEMORY_PIXEL_X), .BITS_PER_MEMORY_PIXEL_Y(BITS_PER_MEMORY_PIXEL_Y),
           .HEX_START_X(HEX_START_X), .HEX_DIGIT_WIDTH(HEX_DIGIT_WIDTH))
         vga_inst(.CLK_50(CLK_50),
-                 .number_drawing_request(number_drawing_request),
-                 .number_rgb(number_rgb),
+                 .hex_drawing_request(hex_drawing_request),
+                 .hex_rgb(hex_rgb),
+                 .perf_drawing_request(perf_drawing_request),
+                 .perf_rgb(perf_rgb),
                  .SW(SW), //temp
                  .pixel_in(word_value),
 
@@ -81,8 +84,8 @@ module top(
                 );
 
     // HEX
-    logic number_drawing_request;
-    logic [7:0] number_rgb;
+    logic hex_drawing_request;
+    logic [7:0] hex_rgb;
     hex_display #(
                     .DATA_WIDTH(DATA_WIDTH),
                     .HEX_DIGITS_PER_LINE(HEX_DIGITS_PER_LINE),
@@ -95,32 +98,28 @@ module top(
                     .pixel_y(pixel_y),
                     .word_value(word_value),
 
-                    .number_drawing_request(number_drawing_request),
-                    .number_rgb(number_rgb)
+                    .hex_drawing_request(hex_drawing_request),
+                    .hex_rgb(hex_rgb)
                 );
 
-    // CYCLE COUNTER
-    // square_object #(.OBJECT_WIDTH_X(HEX_DIGIT_WIDTH*HEX_DIGITS_PER_LINE), .OBJECT_HEIGHT_Y(HEX_DIGIT_WIDTH*20))
-    //               cycle_counter_square(
-    //                   .pixelX(pixel_x),// current VGA pixel
-    //                   .pixelY(pixel_y),
-    //                   .topLeftX(0), //position on the screen
-    //                   .topLeftY(384),
+    // PERFORMANCE COUNTER
+    logic perf_drawing_request;
+    logic [7:0] perf_rgb;
+    perf_counter #(
+                     .NUMBER_OF_DIGITS(NUMBER_OF_DIGITS_PERF),
+                     .HEX_DIGIT_WIDTH(HEX_DIGIT_WIDTH),
+                     .HEX_DIGIT_HEIGHT(HEX_DIGIT_HEIGHT)
+                 )
+                 perf_counter_inst(
+                     .cpu_clk(CLK_50),
+                     .CLK_50(CLK_50),
+                     .resetN(resetN),
+                     .pixel_x(pixel_x),
+                     .pixel_y(pixel_y),
 
-    //                   .offsetX(offsetX),// offset inside bracket from top left position
-    //                   .offsetY(offsetY),
-    //                   .inside_rectangle(inside_rectangle) // indicates pixel inside the bracket
-    //               );
-    // numbers_bitmap #(.digit_color(8'b111_111_11))
-    //                cycle_counter_bitmap(
-    //                    .offsetX(offsetX),
-    //                    .offsetY(offsetY),
-    //                    .InsideRectangle(inside_rectangle),
-    //                    .digit(current_nibble),
-
-    //                    .drawingRequest(number_drawing_request),
-    //                    .RGBout(number_rgb)
-    //                );
+                     .perf_drawing_request(perf_drawing_request),
+                     .perf_rgb(perf_rgb)
+                 );
 
 
 

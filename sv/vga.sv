@@ -2,8 +2,10 @@ module vga(
         input logic CLK_50,
         input logic [DATA_WIDTH-1:0] pixel_in,
         input logic [3:0]  SW,
-        input logic number_drawing_request,
-        input logic [7:0]  number_rgb,
+        input logic hex_drawing_request,
+        input logic [7:0]  hex_rgb,
+        input logic perf_drawing_request,
+        input logic [7:0]  perf_rgb,
 
         output logic [2:0] RED,
         output logic [2:0] GREEN,
@@ -94,12 +96,20 @@ module vga(
                     GREEN <= 3'b001;
                     BLUE  <= 2'b00;
 
-                    // number
-                    if (number_drawing_request)
+                    // hex
+                    if (hex_drawing_request)
                     begin
-                        RED   <= number_rgb[7:5];
-                        GREEN <= number_rgb[4:2];
-                        BLUE  <= number_rgb[1:0];
+                        RED   <= hex_rgb[7:5];
+                        GREEN <= hex_rgb[4:2];
+                        BLUE  <= hex_rgb[1:0];
+                    end
+
+                    // perf
+                    if (perf_drawing_request)
+                    begin
+                        RED   <= perf_rgb[7:5];
+                        GREEN <= perf_rgb[4:2];
+                        BLUE  <= perf_rgb[1:0];
                     end
 
                     // byte border (2 hex digits)
