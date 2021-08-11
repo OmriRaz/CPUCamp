@@ -120,6 +120,7 @@ set_global_assignment -name VERILOG_SHOW_LMF_MAPPING_MESSAGES OFF
 set_global_assignment -name ALLOW_ANY_RAM_SIZE_FOR_RECOGNITION ON
 set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS ON
 set_global_assignment -name FLOW_ENABLE_IO_ASSIGNMENT_ANALYSIS ON
+set_global_assignment -name SYSTEMVERILOG_FILE sv/hex_display.sv
 set_global_assignment -name SYSTEMVERILOG_FILE sv/rom.sv
 set_global_assignment -name SYSTEMVERILOG_FILE sv/square_object.sv
 set_global_assignment -name SYSTEMVERILOG_FILE sv/numbers_bitmap.sv

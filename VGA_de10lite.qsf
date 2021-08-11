@@ -130,6 +130,7 @@ set_location_assignment PIN_N1 -to v_sync
 
 
 set_global_assignment -name TEXT_FILE memory/rom.txt
+set_global_assignment -name SYSTEMVERILOG_FILE sv/hex_display.sv
 set_global_assignment -name SYSTEMVERILOG_FILE sv/vga.sv
 set_global_assignment -name SYSTEMVERILOG_FILE sv/top.sv
 set_global_assignment -name SYSTEMVERILOG_FILE sv/sync_gen.sv

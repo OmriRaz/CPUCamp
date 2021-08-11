@@ -18,7 +18,7 @@ module vga(
     parameter BITS_PER_MEMORY_PIXEL_X;
     parameter BITS_PER_MEMORY_PIXEL_Y;
     parameter HEX_START_X;
-    parameter PIXELS_PER_HEX_DIGIT_X;
+    parameter HEX_DIGIT_WIDTH;
 
     localparam PIXELS_PER_WORD = 2**($clog2(DATA_WIDTH)+BITS_PER_MEMORY_PIXEL_X);
 
@@ -103,7 +103,7 @@ module vga(
                     end
 
                     // byte border (2 hex digits)
-                    if ((pixel_x - HEX_START_X) % (2*PIXELS_PER_HEX_DIGIT_X) == 0 && pixel_y < 384)
+                    if ((pixel_x - HEX_START_X) % (2*HEX_DIGIT_WIDTH) == 0 && pixel_y < 384)
                     begin
                         RED   <= 3'b000;
                         GREEN <= 3'b000;
@@ -111,7 +111,7 @@ module vga(
                     end
 
                     // word border (4 hex digits)
-                    if ((pixel_x - HEX_START_X) % (4*PIXELS_PER_HEX_DIGIT_X) == 0 && pixel_y < 384)
+                    if ((pixel_x - HEX_START_X) % (4*HEX_DIGIT_WIDTH) == 0 && pixel_y < 384)
                     begin
                         RED   <= 3'b000;
                         GREEN <= 3'b000;
