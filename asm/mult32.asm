@@ -68,6 +68,13 @@ D ;JGT
 0;JMP // Infinite loop
 
 
+//====== function add - adds two words with carry
+//@11 - first arg
+//@12 - second arg
+//@20 - carry
+//@21 - sum
+//@30 - scratch
+//@40 - mask (0111...111)
 (ADD)
 @11
 D = M

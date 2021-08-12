@@ -12,7 +12,7 @@ module perf_counter(
 
     parameter NUMBER_OF_DIGITS;
     parameter HEX_DIGIT_WIDTH, HEX_DIGIT_HEIGHT;
-    parameter FINAL_PC;
+    parameter logic [15:0] FINAL_PC;
 
     int unsigned counter_cpu;
     int unsigned counter_50;
@@ -62,7 +62,6 @@ module perf_counter(
             perf_rgb = clks_rgb;
         else
             perf_rgb = seconds_rgb;
-
     end
 
     // clks counter
