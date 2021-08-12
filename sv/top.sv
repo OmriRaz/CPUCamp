@@ -11,6 +11,7 @@ module top(
     parameter DATA_WIDTH = 16, RAM_REGISTER_COUNT = 2**12, RAM_SCREEN_OFFSET = 0;
     parameter ROM_REGISTER_COUNT = 2**12;
     parameter NUMBER_OF_DIGITS_PERF = 8;
+    parameter FINAL_PC = 86;
 
     parameter BITS_PER_MEMORY_PIXEL_X = 4; //4
     parameter BITS_PER_MEMORY_PIXEL_Y = 5; //5
@@ -108,7 +109,8 @@ module top(
     perf_counter #(
                      .NUMBER_OF_DIGITS(NUMBER_OF_DIGITS_PERF),
                      .HEX_DIGIT_WIDTH(HEX_DIGIT_WIDTH),
-                     .HEX_DIGIT_HEIGHT(HEX_DIGIT_HEIGHT)
+                     .HEX_DIGIT_HEIGHT(HEX_DIGIT_HEIGHT),
+                     .FINAL_PC(FINAL_PC)
                  )
                  perf_counter_inst(
                      .cpu_clk(CLK_50),
@@ -116,6 +118,7 @@ module top(
                      .resetN(resetN),
                      .pixel_x(pixel_x),
                      .pixel_y(pixel_y),
+                     .pc(inst_address),
 
                      .perf_drawing_request(perf_drawing_request),
                      .perf_rgb(perf_rgb)
