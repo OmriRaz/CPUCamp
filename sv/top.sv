@@ -1,4 +1,4 @@
-// `define USE_PLL
+`define USE_PLL
 
 module top(
         input     CLK_50,
@@ -16,9 +16,9 @@ module top(
     parameter logic [15:0] FINAL_PC = 16'(ROM_REGISTER_COUNT-1);
 
     // max settings that worked for me:
-    // kiwi -       288/100
+    // kiwi -       280/100
     // de10-lite -  260/100
-    parameter PLL_MULTIPLY = 260;
+    parameter PLL_MULTIPLY = 280;
     parameter PLL_DIVIDE = 100;
 
 
@@ -94,8 +94,8 @@ module top(
         vga_inst(.CLK_50(CLK_50),
                  .hex_drawing_request(hex_drawing_request),
                  .hex_rgb(hex_rgb),
-                 .perf_drawing_request(perf_drawing_request),
-                 .perf_rgb(perf_rgb),
+                 .seconds_drawing_request(seconds_drawing_request),
+                 .seconds_rgb(seconds_rgb),
                  .SW(SW), //temp
                  .pixel_in(word_value),
 
@@ -128,8 +128,8 @@ module top(
                 );
 
     // PERFORMANCE COUNTER
-    logic perf_drawing_request;
-    logic [7:0] perf_rgb;
+    logic seconds_drawing_request;
+    logic [7:0] seconds_rgb;
     perf_counter #(
                      .NUMBER_OF_DIGITS(NUMBER_OF_DIGITS_PERF),
                      .HEX_DIGIT_WIDTH(HEX_DIGIT_WIDTH),
@@ -137,15 +137,14 @@ module top(
                      .FINAL_PC(FINAL_PC)
                  )
                  perf_counter_inst(
-                     .cpu_clk(cpu_clk),
                      .CLK_50(CLK_50),
                      .resetN(resetN),
                      .pixel_x(pixel_x),
                      .pixel_y(pixel_y),
                      .pc(inst_address),
 
-                     .perf_drawing_request(perf_drawing_request),
-                     .perf_rgb(perf_rgb)
+                     .seconds_drawing_request(seconds_drawing_request),
+                     .seconds_rgb(seconds_rgb)
                  );
 
 

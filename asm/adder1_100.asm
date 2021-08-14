@@ -19,5 +19,3 @@ M=M+1 // i=i+1
 @LOOP
 0;JMP // Goto LOOP
 (END)
-@END
-0;JMP // Infinite loop

@@ -1,3 +1,4 @@
+// multiply two numbers and add another one
 @20000 //loop count
 D = A
 @0 //counter

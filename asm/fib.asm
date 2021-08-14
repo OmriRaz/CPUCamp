@@ -1,3 +1,4 @@
+// outputs the 20th fibonacci number in the 0 cell, and 21st in the 1 cell
 @0
 M = 0
 
@@ -27,5 +28,3 @@ D = D - A
 D ;JLT
 
 (END)
-@END
-0;JMP // Infinite loop

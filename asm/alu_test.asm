@@ -1,3 +1,4 @@
+// Tests various functions of the alu
 @157
 D = A
 @0
@@ -105,7 +106,6 @@ M = D
 //===
 @0
 D = M
-@489
 D = D + 1
 @9
 M = D
@@ -113,7 +113,6 @@ M = D
 //===
 @0
 D = M
-@489
 D = D - 1
 @11
 M = D
@@ -162,5 +161,3 @@ D = -D
 M = D
 
 (END)
-@END
-0;JMP // Infinite loop

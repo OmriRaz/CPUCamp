@@ -1,3 +1,4 @@
+// does some difficult calculation on two numbers
 @3163
 D = A
 @id1
@@ -33,7 +34,7 @@ D = A
 @400 //bit mask, 0111...111
 M = D
 
-@200 //number of stages
+@400 //number of stages
 D = A
 @stage
 M = D

@@ -1,3 +1,4 @@
+// Adds two numbers
 @157
 D = A
 @0
@@ -15,5 +16,3 @@ D = M + D
 M = D
 
 (END)
-@END
-0;JMP // Infinite loop
