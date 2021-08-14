@@ -11,8 +11,8 @@ module top(
     parameter DATA_WIDTH = 16, RAM_REGISTER_COUNT = 2**12, RAM_SCREEN_OFFSET = 0;
     parameter ROM_REGISTER_COUNT = 2**12;
     parameter NUMBER_OF_DIGITS_PERF = 8;
-    parameter logic [15:0] FINAL_PC = 16'd129;
-    // parameter FINAL_PC = ROM_REGISTER_COUNT-1;
+    // parameter logic [15:0] FINAL_PC = 16'd129;
+    parameter logic [15:0] FINAL_PC = 16'(ROM_REGISTER_COUNT-1);
 
     parameter BITS_PER_MEMORY_PIXEL_X = 4; //4
     parameter BITS_PER_MEMORY_PIXEL_Y = 5; //5

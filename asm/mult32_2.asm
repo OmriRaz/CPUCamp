@@ -117,6 +117,12 @@ MD = M - 1
 @LOOP
 D; JGT
 
+//copy result to cell 0
+@2
+D = M
+M = 0
+@0
+M = D
 //==================== END
 @END
 0;JMP
@@ -180,5 +186,3 @@ A = M
 0;JMP //ret
 
 (END)
-@END
-0;JMP // Infinite loop

@@ -21,6 +21,22 @@ module perf_counter(
     logic finished;
     assign finished = (finished | (pc == FINAL_PC)) && resetN;
 
+    // integer outfile0; //file descriptor
+    // integer line;
+    // integer counter;
+    // initial
+    // begin
+
+    //     outfile0=$fopen("memory/rom.txt","r");
+    //     //read line by line.
+    //     while (! $feof(outfile0)) //read until an "end of file" is reached.
+    //     begin
+    //         $fgets(line, outfile0);
+    //         counter++;
+    //     end
+    //     $fclose(outfile0);
+    // end
+
     // do the counting
     always_ff @(negedge resetN or posedge cpu_clk)
         if (!resetN)
