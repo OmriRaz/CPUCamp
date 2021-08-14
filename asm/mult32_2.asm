@@ -33,7 +33,7 @@ D = A
 @400 //bit mask, 0111...111
 M = D
 
-@100 //number of stages
+@200 //number of stages
 D = A
 @stage
 M = D
