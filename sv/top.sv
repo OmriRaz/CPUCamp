@@ -1,3 +1,5 @@
+// `define USE_PLL
+
 module top(
         input     CLK_50,
         input  [3:0]  SW,
@@ -11,8 +13,14 @@ module top(
     parameter DATA_WIDTH = 16, RAM_REGISTER_COUNT = 2**12, RAM_SCREEN_OFFSET = 0;
     parameter ROM_REGISTER_COUNT = 2**12;
     parameter NUMBER_OF_DIGITS_PERF = 8;
-    // parameter logic [15:0] FINAL_PC = 16'd129;
     parameter logic [15:0] FINAL_PC = 16'(ROM_REGISTER_COUNT-1);
+
+    // max settings that worked for me:
+    // kiwi -       288/100
+    // de10-lite -  260/100
+    parameter PLL_MULTIPLY = 260;
+    parameter PLL_DIVIDE = 100;
+
 
     parameter BITS_PER_MEMORY_PIXEL_X = 4; //4
     parameter BITS_PER_MEMORY_PIXEL_Y = 5; //5
@@ -29,6 +37,21 @@ module top(
     localparam WORDS_PER_HEX_LINE = BITS_PER_HEX_DIGIT * HEX_DIGITS_PER_LINE / DATA_WIDTH;
     localparam HEX_PIXELS_PER_WORD = DATA_WIDTH / BITS_PER_HEX_DIGIT * HEX_DIGIT_WIDTH;
 
+    //PLL
+    logic cpu_clk;
+
+`ifdef USE_PLL
+
+    pll	#(.MULTIPLY(PLL_MULTIPLY), .DIVIDE(PLL_DIVIDE))
+        pll_inst(
+            .inclk0 ( CLK_50 ),
+            .c0 ( cpu_clk )
+        );
+`else
+    assign cpu_clk = CLK_50;
+`endif
+
+    //===
     logic [$clog2(RAM_REGISTER_COUNT)-1:0] ram_address;
     logic we;
     logic [DATA_WIDTH-1:0] rdata;
@@ -55,7 +78,7 @@ module top(
     end
 
     ram #(.WIDTH(DATA_WIDTH), .REGISTER_COUNT(RAM_REGISTER_COUNT), .RAM_SCREEN_OFFSET(RAM_SCREEN_OFFSET))
-        ram_data(.cpu_clk(CLK_50),
+        ram_data(.cpu_clk(cpu_clk),
                  .CLK_50(CLK_50),
                  .resetN(resetN),
                  .addr(ram_address),
@@ -114,7 +137,7 @@ module top(
                      .FINAL_PC(FINAL_PC)
                  )
                  perf_counter_inst(
-                     .cpu_clk(CLK_50),
+                     .cpu_clk(cpu_clk),
                      .CLK_50(CLK_50),
                      .resetN(resetN),
                      .pixel_x(pixel_x),
@@ -140,7 +163,7 @@ module top(
 
 
     cpu cpu_inst (
-            .clk(CLK_50),
+            .clk(cpu_clk),
             .SW(SW),
             .inst(instruction),
             .in_m(rdata),

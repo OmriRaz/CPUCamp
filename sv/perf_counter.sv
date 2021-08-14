@@ -86,8 +86,7 @@ module perf_counter(
     logic inside_rectangle_clks;
 
     logic [3:0] current_digit_clks;
-    assign current_digit_clks = (counter_cpu >> (4*((HEX_DIGIT_WIDTH*NUMBER_OF_DIGITS - pixel_x) / HEX_DIGIT_WIDTH))) % 16;
-    // assign current_digit_clks = (counter_cpu >> (4*(NUMBER_OF_DIGITS - (pixel_x / HEX_DIGIT_WIDTH)))) % 16;
+    assign current_digit_clks = 4'((counter_cpu >> (4*((HEX_DIGIT_WIDTH*NUMBER_OF_DIGITS - pixel_x) / HEX_DIGIT_WIDTH))) % 16);
 
     square_object #(.OBJECT_WIDTH_X(HEX_DIGIT_WIDTH*NUMBER_OF_DIGITS), .OBJECT_HEIGHT_Y(HEX_DIGIT_HEIGHT))
                   cycle_counter_square(
@@ -122,15 +121,15 @@ module perf_counter(
     always_comb
     begin
         if (pixel_x < 16)
-            current_digit_seconds = (counter_seconds / 10000) % 10;
+            current_digit_seconds = 4'((counter_seconds / 10000) % 10);
         else if (pixel_x < 32)
-            current_digit_seconds = (counter_seconds / 1000) % 10;
+            current_digit_seconds = 4'((counter_seconds / 1000) % 10);
         else if (pixel_x < 48)
-            current_digit_seconds = (counter_seconds / 100) % 10;
+            current_digit_seconds = 4'((counter_seconds / 100) % 10);
         else if (pixel_x < 64)
-            current_digit_seconds = (counter_seconds / 10) % 10;
+            current_digit_seconds = 4'((counter_seconds / 10) % 10);
         else
-            current_digit_seconds = (counter_seconds / 1) % 10;
+            current_digit_seconds = 4'((counter_seconds / 1) % 10);
     end
 
 
