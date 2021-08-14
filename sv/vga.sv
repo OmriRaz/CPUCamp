@@ -26,6 +26,11 @@ module vga(
 
     logic inDisplayArea;
 
+    logic [7:0] output_rgb;
+    assign RED   = output_rgb[7:5];
+    assign GREEN = output_rgb[4:2];
+    assign BLUE  = output_rgb[1:0];
+
     sync_gen sync_inst(
                  .clk(CLK_50),
                  .vga_h_sync(h_sync),
@@ -45,97 +50,60 @@ module vga(
         begin
             if (SW[3])
             begin
-                RED   <= 3'b111;
-                GREEN <= 3'b000;
-                BLUE  <= 2'b00;
+                output_rgb <= 8'b111_000_00;
             end
             else
             begin
                 // off pixel
-                RED   <= 3'b001;
-                GREEN <= 3'b001;
-                BLUE  <= 2'b01;
+                output_rgb <= 8'b001_001_01;
 
                 // on pixel
                 if (pixel_in[(PIXELS_PER_WORD - (pixel_x % PIXELS_PER_WORD)) >> BITS_PER_MEMORY_PIXEL_X])
-                begin
-                    RED   <= 3'b111;
-                    GREEN <= 3'b111;
-                    BLUE  <= 2'b11;
-                end
+                    output_rgb <= 8'b111_111_11;
 
                 // pixel border
                 if (((pixel_x % (2**BITS_PER_MEMORY_PIXEL_X)) == 0) || ((pixel_y % (2**BITS_PER_MEMORY_PIXEL_Y)) == 0))
-                begin
-                    RED   <= 3'b111;
-                    GREEN <= 3'b000;
-                    BLUE  <= 2'b00;
-                end
+                    output_rgb <= 8'b111_000_00;
 
                 // byte border
                 if ((pixel_x % (2**(BITS_PER_MEMORY_PIXEL_X+3))) == 0)
-                begin
-                    RED   <= 3'b000;
-                    GREEN <= 3'b000;
-                    BLUE  <= 2'b01;
-                end
+                    output_rgb <= 8'b000_000_01;
 
                 // word border
                 if ((pixel_x % (2**(BITS_PER_MEMORY_PIXEL_X+4))) == 0)
-                begin
-                    RED   <= 3'b000;
-                    GREEN <= 3'b000;
-                    BLUE  <= 2'b11;
-                end
+                    output_rgb <= 8'b000_000_11;
 
                 // out of boundary
                 if ((pixel_x >= HEX_START_X) || (pixel_y >= 384))
                 begin
                     // background
-                    RED   <= 3'b000;
-                    GREEN <= 3'b001;
-                    BLUE  <= 2'b00;
+                    output_rgb <= 8'b000_001_00;
 
                     // hex
                     if (hex_drawing_request)
-                    begin
-                        RED   <= hex_rgb[7:5];
-                        GREEN <= hex_rgb[4:2];
-                        BLUE  <= hex_rgb[1:0];
-                    end
+                        output_rgb <= hex_rgb;
 
-                    // perf
+                    // seconds
                     if (seconds_drawing_request)
-                    begin
-                        RED   <= seconds_rgb[7:5];
-                        GREEN <= seconds_rgb[4:2];
-                        BLUE  <= seconds_rgb[1:0];
-                    end
+                        output_rgb <= seconds_rgb;
+
+                    //decimal point for seconds
+                    if ((pixel_x == 32 || pixel_x == 31) && (pixel_y==448 || pixel_y==447))
+                        output_rgb <= 8'b111_000_00;
 
                     // byte border (2 hex digits)
                     if ((pixel_x - HEX_START_X) % (2*HEX_DIGIT_WIDTH) == 0 && pixel_y < 384)
-                    begin
-                        RED   <= 3'b000;
-                        GREEN <= 3'b000;
-                        BLUE  <= 2'b01;
-                    end
+                        output_rgb <= 8'b000_000_01;
 
                     // word border (4 hex digits)
                     if ((pixel_x - HEX_START_X) % (4*HEX_DIGIT_WIDTH) == 0 && pixel_y < 384)
-                    begin
-                        RED   <= 3'b000;
-                        GREEN <= 3'b000;
-                        BLUE  <= 2'b11;
-                    end
+                        output_rgb <= 8'b000_000_11;
                 end
             end
         end
         else
-        begin
-            RED   <= 3'b000;
-            GREEN <= 3'b000;
-            BLUE  <= 2'b00;
-        end
+            // blanking time
+            output_rgb <= 8'b000_000_00;
 
     end
 endmodule
