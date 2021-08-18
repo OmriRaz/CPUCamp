@@ -1,12 +1,21 @@
+`include "definitions.sv"
+
 module perf_counter(
         input logic CLK_50,
         input logic resetN,
         input logic [9:0] pixel_x,
         input logic [9:0] pixel_y,
         input logic [15:0] pc,
+        input logic [3:0] SW,
 
         output logic perf_drawing_request,
-        output logic [7:0] perf_rgb
+        output logic [7:0] perf_rgb,
+
+        output logic [6:0]  HEX0,
+        output logic [6:0]  HEX1,
+        output logic [6:0]  HEX2,
+
+        output logic [9:0] LED
     );
 
     parameter NUMBER_OF_DIGITS;
@@ -59,8 +68,17 @@ module perf_counter(
     assign perf_drawing_request = seconds_drawing_request | clocks_drawing_request;
     assign perf_rgb = seconds_drawing_request ? seconds_rgb : clocks_rgb;
 
+    logic [3:0] digits_clks [7:0];
+    always_ff @(posedge CLK_50)
+    begin
+        for (int i=0; i<8; i++)
+        begin
+            digits_clks[i] <= 4'(counter_50 >> (4*i));
+        end
+    end
     logic [3:0] current_digit_clks;
-    assign current_digit_clks = 4'((counter_50 >> (4*((HEX_DIGIT_WIDTH*NUMBER_OF_DIGITS - pixel_x) / HEX_DIGIT_WIDTH))) % 16);
+    // assign current_digit_clks = 4'((counter_50 >> (4*((HEX_DIGIT_WIDTH*NUMBER_OF_DIGITS - pixel_x) / HEX_DIGIT_WIDTH))) % 16);
+    assign current_digit_clks = digits_clks[(HEX_DIGIT_WIDTH*NUMBER_OF_DIGITS - pixel_x) / HEX_DIGIT_WIDTH];
 
     number_display #(.OBJECT_WIDTH_X(HEX_DIGIT_WIDTH*4), .OBJECT_HEIGHT_Y(HEX_DIGIT_HEIGHT), .digit_color(8'b111_111_11))
                    seconds_counter_display(
@@ -84,5 +102,110 @@ module perf_counter(
                        .drawingRequest(clocks_drawing_request),
                        .RGBout(clocks_rgb)
                    );
+
+    // 7 segment
+    logic [3:0] digits_clks_out [2:0];
+    always_ff @(posedge CLK_50)
+    begin
+`ifdef DE10_LITE
+
+        LED <= 10'h0;
+`else
+        LED <= 8'hFF;
+`endif
+
+`ifdef KIWI
+
+        LED[0] <= !finished;
+
+        if (SW[3])
+        begin
+            digits_clks_out[0] <= digits_clks[0];
+            digits_clks_out[1] <= digits_clks[1];
+            digits_clks_out[2] <= digits_clks[2];
+            LED[7] <= 1'b0;
+        end
+        else if (SW[2])
+        begin
+            digits_clks_out[0] <= digits_clks[3];
+            digits_clks_out[1] <= digits_clks[4];
+            digits_clks_out[2] <= digits_clks[5];
+            LED[6] <= 1'b0;
+        end
+        else if (SW[1])
+        begin
+            digits_clks_out[0] <= digits_clks[6];
+            digits_clks_out[1] <= digits_clks[7];
+            digits_clks_out[2] <= 4'b0;
+            LED[5] <= 1'b0;
+        end
+        else
+        begin
+            digits_clks_out[0] <= 4'b0;
+            digits_clks_out[1] <= 4'b0;
+            digits_clks_out[2] <= 4'b0;
+        end
+`else
+        LED[7] <= finished;
+
+        if (SW[0])
+        begin
+            digits_clks_out[0] <= digits_clks[0];
+            digits_clks_out[1] <= digits_clks[1];
+            digits_clks_out[2] <= digits_clks[2];
+            LED[0] <= 1'b1;
+        end
+        else if (SW[1])
+        begin
+            digits_clks_out[0] <= digits_clks[3];
+            digits_clks_out[1] <= digits_clks[4];
+            digits_clks_out[2] <= digits_clks[5];
+            LED[1] <= 1'b1;
+        end
+        else if (SW[2])
+        begin
+            digits_clks_out[0] <= digits_clks[6];
+            digits_clks_out[1] <= digits_clks[7];
+            digits_clks_out[2] <= 4'b0;
+            LED[2] <= 1'b1;
+        end
+        else
+        begin
+            digits_clks_out[0] <= 4'b0;
+            digits_clks_out[1] <= 4'b0;
+            digits_clks_out[2] <= 4'b0;
+        end
+`endif
+
+    end
+
+`ifdef KIWI
+    seg7 seg7_0 (
+             .input_dig(digits_clks_out[2]),
+             .output_seg(HEX0)
+         );
+    seg7 seg7_1 (
+             .input_dig(digits_clks_out[1]),
+             .output_seg(HEX1)
+         );
+    seg7 seg7_2 (
+             .input_dig(digits_clks_out[0]),
+             .output_seg(HEX2)
+         );
+`else
+    seg7 seg7_0 (
+             .input_dig(digits_clks_out[2]),
+             .output_seg(HEX2)
+         );
+    seg7 seg7_1 (
+             .input_dig(digits_clks_out[1]),
+             .output_seg(HEX1)
+         );
+    seg7 seg7_2 (
+             .input_dig(digits_clks_out[0]),
+             .output_seg(HEX0)
+         );
+
+`endif
 
 endmodule

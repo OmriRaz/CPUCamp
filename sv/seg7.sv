@@ -2,6 +2,7 @@
 // Written By David Bar-On  June 2018
 // Edited by Guy Shapira August 2021
 
+`include "definitions.sv"
 
 // ---t----
 // |       |
@@ -17,6 +18,14 @@ module seg7(
         input  logic [3:0]  input_dig,
         output logic [6:0] output_seg
     );
+
+`ifdef SEG7_ACTIVE_LOW
+
+    parameter logic ACTIVE_LOW = 1'b1;
+`else
+    parameter logic ACTIVE_LOW = 1'b0;
+`endif
+
 
     //seven seg decoder
     always_comb
@@ -55,6 +64,8 @@ module seg7(
             4'h0:
                 output_seg = 7'b1000000;
         endcase
+        if (ACTIVE_LOW)
+            output_seg = ~output_seg;
     end
 
 endmodule

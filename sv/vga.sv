@@ -1,15 +1,14 @@
 module vga(
         input logic CLK_50,
         input logic [DATA_WIDTH-1:0] pixel_in,
-        input logic [3:0]  SW,
         input logic hex_drawing_request,
         input logic [7:0]  hex_rgb,
         input logic perf_drawing_request,
         input logic [7:0]  perf_rgb,
 
-        output logic [2:0] RED,
-        output logic [2:0] GREEN,
-        output logic [1:0] BLUE,
+        output logic [3:0] RED,
+        output logic [3:0] GREEN,
+        output logic [3:0] BLUE,
         output logic h_sync,
         output logic v_sync,
         output logic [9:0] pixel_x,
@@ -27,9 +26,15 @@ module vga(
     logic inDisplayArea;
 
     logic [7:0] output_rgb;
-    assign RED   = output_rgb[7:5];
-    assign GREEN = output_rgb[4:2];
-    assign BLUE  = output_rgb[1:0];
+    assign RED[2:0]   = output_rgb[7:5];
+    assign GREEN[2:0] = output_rgb[4:2];
+    assign BLUE[1:0]  = output_rgb[1:0];
+
+    // Naively expand 3-3-2 bits to 4-4-4
+    assign RED[3] = RED[2];
+    assign GREEN[3] = GREEN[2];
+    assign BLUE[3] = BLUE[2];
+    assign BLUE[2] = BLUE[1];
 
     sync_gen sync_inst(
                  .clk(CLK_50),
@@ -48,57 +53,50 @@ module vga(
     begin
         if (inDisplayArea)
         begin
-            if (SW[3])
-            begin
+            // off pixel
+            output_rgb <= 8'b001_001_01;
+
+            // on pixel
+            if (pixel_in[(PIXELS_PER_WORD - (pixel_x % PIXELS_PER_WORD)) >> BITS_PER_MEMORY_PIXEL_X])
+                output_rgb <= 8'b111_111_11;
+
+            // pixel border
+            if (((pixel_x % (2**BITS_PER_MEMORY_PIXEL_X)) == 0) || ((pixel_y % (2**BITS_PER_MEMORY_PIXEL_Y)) == 0))
                 output_rgb <= 8'b111_000_00;
-            end
-            else
+
+            // byte border
+            if ((pixel_x % (2**(BITS_PER_MEMORY_PIXEL_X+3))) == 0)
+                output_rgb <= 8'b000_000_01;
+
+            // word border
+            if ((pixel_x % (2**(BITS_PER_MEMORY_PIXEL_X+4))) == 0)
+                output_rgb <= 8'b000_000_11;
+
+            // out of boundary
+            if ((pixel_x >= HEX_START_X) || (pixel_y >= 384))
             begin
-                // off pixel
-                output_rgb <= 8'b001_001_01;
+                // background
+                output_rgb <= 8'b000_001_00;
 
-                // on pixel
-                if (pixel_in[(PIXELS_PER_WORD - (pixel_x % PIXELS_PER_WORD)) >> BITS_PER_MEMORY_PIXEL_X])
-                    output_rgb <= 8'b111_111_11;
+                // hex
+                if (hex_drawing_request)
+                    output_rgb <= hex_rgb;
 
-                // pixel border
-                if (((pixel_x % (2**BITS_PER_MEMORY_PIXEL_X)) == 0) || ((pixel_y % (2**BITS_PER_MEMORY_PIXEL_Y)) == 0))
+                // seconds
+                if (perf_drawing_request)
+                    output_rgb <= perf_rgb;
+
+                //decimal point for seconds
+                if ((pixel_x == 32 || pixel_x == 31) && (pixel_y==448 || pixel_y==447))
                     output_rgb <= 8'b111_000_00;
 
-                // byte border
-                if ((pixel_x % (2**(BITS_PER_MEMORY_PIXEL_X+3))) == 0)
+                // byte border (2 hex digits)
+                if ((pixel_x - HEX_START_X) % (2*HEX_DIGIT_WIDTH) == 0 && pixel_y < 384)
                     output_rgb <= 8'b000_000_01;
 
-                // word border
-                if ((pixel_x % (2**(BITS_PER_MEMORY_PIXEL_X+4))) == 0)
+                // word border (4 hex digits)
+                if ((pixel_x - HEX_START_X) % (4*HEX_DIGIT_WIDTH) == 0 && pixel_y < 384)
                     output_rgb <= 8'b000_000_11;
-
-                // out of boundary
-                if ((pixel_x >= HEX_START_X) || (pixel_y >= 384))
-                begin
-                    // background
-                    output_rgb <= 8'b000_001_00;
-
-                    // hex
-                    if (hex_drawing_request)
-                        output_rgb <= hex_rgb;
-
-                    // seconds
-                    if (perf_drawing_request)
-                        output_rgb <= perf_rgb;
-
-                    //decimal point for seconds
-                    if ((pixel_x == 32 || pixel_x == 31) && (pixel_y==448 || pixel_y==447))
-                        output_rgb <= 8'b111_000_00;
-
-                    // byte border (2 hex digits)
-                    if ((pixel_x - HEX_START_X) % (2*HEX_DIGIT_WIDTH) == 0 && pixel_y < 384)
-                        output_rgb <= 8'b000_000_01;
-
-                    // word border (4 hex digits)
-                    if ((pixel_x - HEX_START_X) % (4*HEX_DIGIT_WIDTH) == 0 && pixel_y < 384)
-                        output_rgb <= 8'b000_000_11;
-                end
             end
         end
         else

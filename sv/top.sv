@@ -1,12 +1,20 @@
-`define USE_PLL
+`include "definitions.sv"
 
 module top(
         input     CLK_50,
         input  [3:0]  SW,
         input  [1:0] BUTTON,
-        output [2:0]  RED,
-        output [2:0]  GREEN,
-        output [1:0]  BLUE,
+
+        output    [6:0]    HEX0,
+        output    [6:0]    HEX1,
+        output    [6:0]    HEX2,
+
+        output [9:0] LED,
+
+        output [3:0]  RED,
+        output [3:0]  GREEN,
+        output [3:0]  BLUE,
+
         output      h_sync,
         output    v_sync
     );
@@ -14,13 +22,6 @@ module top(
     parameter ROM_REGISTER_COUNT = 2**12;
     parameter NUMBER_OF_DIGITS_PERF = 8;
     parameter logic [15:0] FINAL_PC = 16'(ROM_REGISTER_COUNT-1);
-
-    // max settings that worked for me:
-    // kiwi -       280/100
-    // de10-lite -  260/100
-    parameter PLL_MULTIPLY = 250;
-    parameter PLL_DIVIDE = 100;
-
 
     parameter BITS_PER_MEMORY_PIXEL_X = 4; //4
     parameter BITS_PER_MEMORY_PIXEL_Y = 5; //5
@@ -42,7 +43,7 @@ module top(
 
 `ifdef USE_PLL
 
-    pll	#(.MULTIPLY(PLL_MULTIPLY), .DIVIDE(PLL_DIVIDE))
+    pll #(.MULTIPLY(`PLL_MULTIPLY), .DIVIDE(`PLL_DIVIDE))
         pll_inst(
             .inclk0 ( CLK_50 ),
             .c0 ( cpu_clk )
@@ -96,7 +97,6 @@ module top(
                  .hex_rgb(hex_rgb),
                  .perf_drawing_request(perf_drawing_request),
                  .perf_rgb(perf_rgb),
-                 .SW(SW), //temp
                  .pixel_in(word_value),
 
                  .RED(RED),
@@ -142,11 +142,17 @@ module top(
                      .pixel_x(pixel_x),
                      .pixel_y(pixel_y),
                      .pc(inst_address),
+                     .SW(SW),
 
                      .perf_drawing_request(perf_drawing_request),
-                     .perf_rgb(perf_rgb)
-                 );
+                     .perf_rgb(perf_rgb),
 
+                     .HEX0(HEX0),
+                     .HEX1(HEX1),
+                     .HEX2(HEX2),
+
+                     .LED(LED)
+                 );
 
 
     //CPU AND ROM
