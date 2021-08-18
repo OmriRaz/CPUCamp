@@ -1,9 +1,9 @@
 import os.path
 import os
 
-DE10_LITE = "VGA_de10lite.qsf"
-KIWI = "VGA_kiwi.qsf"
-NEUTRAL = "VGA.qsf"
+DE10_LITE = "CPU_Garage_de10lite.qsf"
+KIWI = "CPU_Garage_kiwi.qsf"
+NEUTRAL = "CPU_Garage.qsf"
 
 if os.path.isfile(DE10_LITE):
     # switch to DE10_LITE
