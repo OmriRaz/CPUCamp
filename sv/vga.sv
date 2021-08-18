@@ -4,8 +4,8 @@ module vga(
         input logic [3:0]  SW,
         input logic hex_drawing_request,
         input logic [7:0]  hex_rgb,
-        input logic seconds_drawing_request,
-        input logic [7:0]  seconds_rgb,
+        input logic perf_drawing_request,
+        input logic [7:0]  perf_rgb,
 
         output logic [2:0] RED,
         output logic [2:0] GREEN,
@@ -84,8 +84,8 @@ module vga(
                         output_rgb <= hex_rgb;
 
                     // seconds
-                    if (seconds_drawing_request)
-                        output_rgb <= seconds_rgb;
+                    if (perf_drawing_request)
+                        output_rgb <= perf_rgb;
 
                     //decimal point for seconds
                     if ((pixel_x == 32 || pixel_x == 31) && (pixel_y==448 || pixel_y==447))

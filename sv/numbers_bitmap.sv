@@ -2,7 +2,7 @@
 // coding convention Dudy October 2020
 // (c) Technion IIT, Department of Electrical Engineering 2019
 // generating a number bitmap
-// edited by Guy Shapira August 2021
+// Edited by Guy Shapira August 2021
 
 module numbers_bitmap (
         input  logic [10:0] offsetX,// offset from top left  position

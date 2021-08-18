@@ -142,6 +142,8 @@ set_global_assignment -name SYSTEMVERILOG_FILE sv/ram.sv
 set_global_assignment -name SYSTEMVERILOG_FILE sv/numbers_bitmap.sv
 set_global_assignment -name SYSTEMVERILOG_FILE sv/cpu.sv
 set_global_assignment -name SYSTEMVERILOG_FILE sv/alu.sv
+set_global_assignment -name SYSTEMVERILOG_FILE sv/seg7.sv
+set_global_assignment -name SYSTEMVERILOG_FILE sv/number_display.sv
 set_global_assignment -name SDC_FILE DE10_LITE_TEST.SDC
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85

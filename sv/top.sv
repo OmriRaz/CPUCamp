@@ -18,7 +18,7 @@ module top(
     // max settings that worked for me:
     // kiwi -       280/100
     // de10-lite -  260/100
-    parameter PLL_MULTIPLY = 280;
+    parameter PLL_MULTIPLY = 250;
     parameter PLL_DIVIDE = 100;
 
 
@@ -94,8 +94,8 @@ module top(
         vga_inst(.CLK_50(CLK_50),
                  .hex_drawing_request(hex_drawing_request),
                  .hex_rgb(hex_rgb),
-                 .seconds_drawing_request(seconds_drawing_request),
-                 .seconds_rgb(seconds_rgb),
+                 .perf_drawing_request(perf_drawing_request),
+                 .perf_rgb(perf_rgb),
                  .SW(SW), //temp
                  .pixel_in(word_value),
 
@@ -108,7 +108,7 @@ module top(
                  .pixel_y(pixel_y)
                 );
 
-    // HEX
+    // HEX (NOT 7 Segment, but display on screen)
     logic hex_drawing_request;
     logic [7:0] hex_rgb;
     hex_display #(
@@ -127,9 +127,9 @@ module top(
                     .hex_rgb(hex_rgb)
                 );
 
-    // PERFORMANCE COUNTER
-    logic seconds_drawing_request;
-    logic [7:0] seconds_rgb;
+    // performance counter
+    logic perf_drawing_request;
+    logic [7:0] perf_rgb;
     perf_counter #(
                      .NUMBER_OF_DIGITS(NUMBER_OF_DIGITS_PERF),
                      .HEX_DIGIT_WIDTH(HEX_DIGIT_WIDTH),
@@ -143,8 +143,8 @@ module top(
                      .pixel_y(pixel_y),
                      .pc(inst_address),
 
-                     .seconds_drawing_request(seconds_drawing_request),
-                     .seconds_rgb(seconds_rgb)
+                     .perf_drawing_request(perf_drawing_request),
+                     .perf_rgb(perf_rgb)
                  );
 
 
