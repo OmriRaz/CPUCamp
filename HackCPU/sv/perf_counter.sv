@@ -15,7 +15,9 @@ module perf_counter(
         output logic [6:0]  HEX1,
         output logic [6:0]  HEX2,
 
-        output logic [9:0] LED
+        output logic [9:0] LED,
+
+        output logic finished
     );
 
     parameter NUMBER_OF_DIGITS;
@@ -25,7 +27,6 @@ module perf_counter(
     int unsigned counter_50;
     logic unsigned [12:0] counter_hund_seconds;
 
-    logic finished;
     assign finished = (finished | (pc == FINAL_PC)) && resetN;
 
     // do the counting

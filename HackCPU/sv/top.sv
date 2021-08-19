@@ -66,6 +66,8 @@ module top(
     logic resetN;
     assign resetN = BUTTON[0];
 
+    logic finished;
+
     always_comb
     begin
         // Binary
@@ -151,7 +153,8 @@ module top(
                      .HEX1(HEX1),
                      .HEX2(HEX2),
 
-                     .LED(LED)
+                     .LED(LED),
+                     .finished(finished)
                  );
 
 
@@ -168,7 +171,7 @@ module top(
 
 
     cpu cpu_inst (
-            .clk(cpu_clk),
+            .clk(cpu_clk && !finished),
             .SW(SW),
             .inst(instruction),
             .in_m(rdata),
