@@ -1,9 +1,10 @@
-// does some difficult calculation on two numbers
-@3163
+// Does some difficult calculation on two numbers
+// Put your ID as two numbers below
+@1234 // YOUR ID HERE (first 4 digits)
 D = A
 @id1
 M = D
-@9161
+@5678 // YOUR ID HERE (next 4 digits)
 D = A
 @id2
 M = D

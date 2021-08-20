@@ -1,6 +1,6 @@
 import copy
 
-ORIG_IDS = [3163, 9161]
+ORIG_IDS = [1234, 5678]
 
 ids = copy.deepcopy(ORIG_IDS)
 start = 555

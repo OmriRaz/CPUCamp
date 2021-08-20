@@ -163,9 +163,9 @@ module top(
     logic [DATA_WIDTH-1:0] cpu_out_m;
     logic [$clog2(ROM_REGISTER_COUNT)-1:0] inst_address;
 
-    rom #(.WIDTH(DATA_WIDTH), .REGISTER_COUNT(ROM_REGISTER_COUNT))
-        rom_inst (
-            .addr(inst_address),
+    rom rom_inst (
+            .address(inst_address),
+            .clock(cpu_clk),
             .q(instruction)
         );
 

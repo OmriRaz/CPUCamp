@@ -1,5 +1,5 @@
 // multiply two numbers and add another one
-@20000 //loop count
+@20000 //loop count (multiplier)
 D = A
 @0 //counter
 M = D
@@ -9,9 +9,9 @@ D = A
 @3 //result
 M = D
 
-@5123
+@5123 //addend value
 D = A
-@4 //addend
+@4 //addend address
 M = D
 
 @16384
@@ -64,9 +64,8 @@ D = M
 @LOOP
 D ;JGT
 
-(END)
 @END
-0;JMP // Infinite loop
+0;JMP
 
 
 //====== function add - adds two words with carry
@@ -124,3 +123,5 @@ M = 1
 @10
 A = M
 0;JMP //ret
+
+(END)

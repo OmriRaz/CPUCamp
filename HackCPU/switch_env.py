@@ -21,3 +21,5 @@ with open("platform.sv", "w") as platform_file:
         # switch to kiwi
         copyfile(os.path.join(QSF_FOLDER, KIWI), NEUTRAL)
         platform_file.write("`define KIWI")
+
+print("Done.")

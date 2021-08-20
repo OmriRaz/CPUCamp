@@ -19,6 +19,8 @@ Another option is to compile it from the code in this directory:
 
 After programming the device, you'll see on the screen the first few words of the data memory, in binary and in hex. In the bottom of the screen you'll see a clock count (50MHz) in hex, and time count in hundreths of a second.
 
+Note: The Kiwi will start with no program. You need to program it at runtime, which is explained below.
+
 ### Seven Segment Display
 
 In case you don't have a screen, you can see the clock count on the 7 segment displays. Switch the rightmost switch to get the 3 least significant hex digits of the clock count. The next switch will show the next 3 digits. There are 8 digits in total. 
@@ -29,7 +31,7 @@ When the CPU finishes executing the program, the leftmost LED will turn on.
 
 ## Design
 
-The project consists of a top level module named `top`. It instanciates these major submodules:
+The project consists of a top level module named `top`. It instantiates these major submodules:
 * CPU
 * Instruction ROM
 * RAM
@@ -39,22 +41,68 @@ The project consists of a top level module named `top`. It instanciates these ma
 
 ![Block Diagram](images/cpu_camp.png)
 
-## Run a Custom Program
+### CPU
 
-The `asm` folder contains some assembly programs you can run on the CPU. You can also write your own, according to the specification of the nand2tetris course: https://www.nand2tetris.org/.
+The CPU's functionality is exactly as described in the nand2tetris course book.
 
-The mult32_2 program does the same as the python script at `python/mult32_2.py`. The solution of alu_test is in the Excel file `asm/alu_test.xlsx`.
+### ROM
 
-In order to run a program, follow these steps:
+The ROM is slightly different from the one described in the course book. It contains 4096 words, 16 bit each, and is synchronous, i.e.:
+```
+output(t) = ROM[address(t-1)]
+```
+
+### RAM
+
+The RAM is also different from the course. It is the same dimensions as the ROM, and is synchronous too. Writing is defined in this way:
+```
+if (writeEnable(t) == 1)
+    RAM[address(t)](t+1) = OutM(t)
+```
+The RAM is implemented in dual channel mode. The CPU interacts with the first channel only. The second channel is used for the VGA and should not concern you.
+
+### VGA
+
+The screen shows 12 lines, 2 words per line, begining at offset 0 in the RAM.
+
+## Run a Sample Program
+
+The `Sample Programs` folder contains some assembly programs you can run on the CPU. These programs have already been assembled for you and the assembled versions are in the `hack` folder. Intel Hex versions were also prepared for you in the `hex` folder.
+
+The `alu_test` tests basic functions of the CPU. The expected result is in the Excel file `Sample Programs/alu_test.xlsx`.
+
+The other programs test some basic loops and should be self-explanatory.
+
+### DE10-Lite
+
+If you work on the DE10-Lite, overwrite the `memory/rom.hex` file with your desired hex program. Compile the project and program the device, push the reset button (Key 0) and the program will run.
+
+You may also write the program to the ROM in runtime. Read the next section (Kiwi) to learn how.
+
+### Kiwi
+
+Preloading the ROM is not supported on the Kiwi, thus the `memory/rom.hex` file is ignored. To write the program to the ROM at runtime, follow these steps:
+* Compile the project and program the device as usual.
+* In Quartus, open `Tools > In-System Memory Content Editor` (hereafter: "ISMCE").
+* An instance named `ROM` will be found. Right click it and select `Import Data from File...`
+* Select your desired `hex` file.
+* Right click the instance and click `Write Data to In-System Memory`.
+* Reset the device and the program will run.
+
+## Run Your Own Program
+
+You can also write your own programs, according to the specification of the nand2tetris course: https://www.nand2tetris.org/.
+
+In order to run your program, you'll have to generate the hex file yourself. Follow these steps:
 * Download the official software suite from https://www.nand2tetris.org/software.
 * Assemble your program using the assembler in the suite.
-* Copy the resulting binary code into the file `memory/rom.txt`.
-* Compile and program the device.
+* Copy the resulting binary code into the `hack` directory.
+* Run the script at `python/hack_to_hex.py`. Your program will be converted to hex format and put in the `hex` directory. 
+* Write the resulting `hex` file to the memory using the ISMCE as explained above.
+* Compile the project and program the device.
 
 Remarks:
-* The `asm` folder also contains pre-assembled code for the given programs, you don't need to assemble them yourself.
 * The system halts when the CPU reaches line 4095 (the last one). Thus, you must **not** add an infinite loop to your code, or else the performance counter will not stop. Simply ensure the CPU will reach the last line.
-* (TODO) Preloading the memory on the Kiwi is unsupported. Use the ISMCE.
 
 
 ## Your Challenge
@@ -62,6 +110,8 @@ Remarks:
 Write your version of the CPU (and ALU) with the same functionality and interface, but better. Your CPU should execute the given program correctly and in as little clock cycles (50MHz) as possible.
 
 You may overwrite **only** the `sv/alu.sv` and `sv/cpu.sv` files, and the PLL settings in `sv/definitions.sv`.
+
+Your CPU will be tested by running a program similar to `mult_32.asm`. Put your ID in the begining of both the `asm` file and in the python script at `python/mult32_2`. Convert the `asm` file to `hex` and then run the program on the CPU (as explained above). The first line on the screen should match the first line in the script output. The next non-zero line is your id in hex (which the script will show you as well).
 
 ### PLL
 
@@ -72,8 +122,6 @@ To speed things up, you may increase the clock frequency using a PLL. Open the `
 
 # TODO
 
-Use synchoronous memory.
+Use synchoronous memory. (ROM is done)
 
 Create a program for the competition.
-
-Memory preloading on the Kiwi.
