@@ -80,17 +80,18 @@ module top(
                                        + ((pixel_x - HEX_START_X) / HEX_PIXELS_PER_WORD));
     end
 
-    ram #(.WIDTH(DATA_WIDTH), .REGISTER_COUNT(RAM_REGISTER_COUNT), .RAM_SCREEN_OFFSET(RAM_SCREEN_OFFSET))
-        ram_data(.cpu_clk(cpu_clk),
-                 .CLK_50(CLK_50),
-                 .resetN(resetN),
-                 .addr(ram_address),
-                 .rdata(rdata),
-                 .wdata(cpu_out_m),
-                 .we(we),
-                 .addr_screen(word_address),
-                 .rdata_screen(word_value)
-                );
+    ram ram_inst (
+            .address_a (ram_address),
+            .address_b (RAM_SCREEN_OFFSET +  word_address),
+            .clock_a (cpu_clk),
+            .clock_b (CLK_50),
+            .data_a (cpu_out_m),
+            .data_b (16'b0),
+            .wren_a (we),
+            .wren_b (16'b0),
+            .q_a (rdata),
+            .q_b (word_value)
+        );
 
     vga #(.DATA_WIDTH(DATA_WIDTH), .BITS_PER_MEMORY_PIXEL_X(BITS_PER_MEMORY_PIXEL_X), .BITS_PER_MEMORY_PIXEL_Y(BITS_PER_MEMORY_PIXEL_Y),
           .HEX_START_X(HEX_START_X), .HEX_DIGIT_WIDTH(HEX_DIGIT_WIDTH))

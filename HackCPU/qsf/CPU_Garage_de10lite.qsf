@@ -241,6 +241,7 @@ set_global_assignment -name SYSTEMVERILOG_FILE sv/number_display.sv
 set_global_assignment -name SYSTEMVERILOG_FILE sv/definitions.sv
 set_global_assignment -name SDC_FILE DE10_LITE_TEST.SDC
 set_global_assignment -name QIP_FILE sv/rom.qip
+set_global_assignment -name QIP_FILE sv/ram.qip
 set_global_assignment -name ENABLE_OCT_DONE OFF
 set_global_assignment -name EXTERNAL_FLASH_FALLBACK_ADDRESS 00000000
 set_global_assignment -name STRATIXV_CONFIGURATION_SCHEME "PASSIVE SERIAL"

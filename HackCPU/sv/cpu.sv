@@ -16,6 +16,16 @@ module cpu (
     reg [15:0] a;
     reg [15:0] d;
 
+    logic stall;
+
+    always_ff @(posedge clk or negedge resetN)
+    begin
+        if (!resetN)
+            stall <= 1'b1;
+        else
+            stall <= !stall;
+    end
+
     //ALU module instantiation
     alu alu0(
             .x(d),
@@ -35,23 +45,22 @@ module cpu (
     wire less_than_zero = alu_out[15];
     wire greater_than_zero = !(less_than_zero || zero);
     wire [14:0] next_pc = sel_pc ? a[14:0] : pc + 15'b1;
-    wire [15:0] next_a = sel_a ? alu_out : {1'b0, inst[14:0]};
-    wire [15:0] next_d = alu_out;
+    wire [15:0] next_a = !stall ? (sel_a ? alu_out : {1'b0, inst[14:0]}) : a;
+    wire [15:0] next_d = !stall ? alu_out : d;
     wire [15:0] am = sel_am ? m : a; // decide whether the alu will use the data in memory or in the A register
     wire [15:0] alu_out;
     wire [5:0] alu_fn = inst[11:6]; //function for the ALU
     wire [15:0] m = in_m;
     assign data_addr = a[14:0];
     assign out_m = alu_out;
-    assign write_m = inst[15] && inst[3];
+    assign write_m = inst[15] && inst[3] && !stall;
     assign inst_addr = pc;
 
     always @(posedge clk)
         if (!resetN)
             pc <= 15'b0;
-        else
+        else if (!stall)
             pc <= next_pc;
-
 
     always @(posedge clk)
         if (load_a)
