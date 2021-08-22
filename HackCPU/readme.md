@@ -37,13 +37,9 @@ The project consists of a top level module named `top`. It instantiates these ma
 * RAM
 * VGA
 
-### Block Diagram
+### Computer Block Diagram
 
-![Block Diagram](images/cpu_camp.png)
-
-### CPU
-
-The CPU's functionality is exactly as described in the nand2tetris course book.
+![Computer Block Diagram](images/computer_arch.png)
 
 ### ROM
 
@@ -64,6 +60,14 @@ The RAM is implemented in dual channel mode. The CPU interacts with the first ch
 ### VGA
 
 The screen shows 12 lines, 2 words per line, begining at offset 0 in the RAM.
+
+### CPU
+
+The CPU's functionality is exactly as described in the nand2tetris course book. But as we decided to use synchronous RAM, input data from it will lag until the next clock cycle. To workaround this issue, the CPU stalls every second clock cycle. By stalling we mean the A, D, and PC registers are not updated. This way, when the CPU is not stalled, the input data is up to date.
+
+The CPU block diagram, as described in the course book:
+
+![CPU Block Diagram](images/cpu_arch.png)
 
 ## Run a Sample Program
 
@@ -117,11 +121,4 @@ Your CPU will be tested by running a program similar to `mult_32.asm`. Put your 
 
 To speed things up, you may increase the clock frequency using a PLL. Open the `sv/definitions.sv` file and follow the instructions there.
 
----
----
 
-# TODO
-
-Use synchoronous memory. (ROM is done)
-
-Create a program for the competition.
