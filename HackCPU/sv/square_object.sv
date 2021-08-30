@@ -1,19 +1,15 @@
-//-- Alex Grinshpun Apr 2017
-//-- Dudy Nov 13 2017
-// System-Verilog Alex Grinshpun May 2018
-// New coding convention dudy October 2020
-// (c) Technion IIT, Department of Electrical Engineering 2019
-// edited by Guy Shapira August 2021
+// Represents a square object. Outputs the offsets from
+// the top left corner to be used by a bitmap.
 
 module square_object (
-        input  logic [10:0] pixelX,// current VGA pixel
+        input  logic [10:0] pixelX, //current VGA pixel
         input  logic [10:0] pixelY,
         input  logic signed [10:0] topLeftX, //position on the screen
         input  logic signed [10:0] topLeftY,
 
-        output logic [10:0] offsetX,// offset inside bracket from top left position
+        output logic [10:0] offsetX, //offset inside bracket from top left position
         output logic [10:0] offsetY,
-        output logic inside_rectangle // indicates pixel inside the bracket
+        output logic inside_rectangle //indicates the pixel is inside the bracket
     );
 
     parameter int signed OBJECT_WIDTH_X = 16;
