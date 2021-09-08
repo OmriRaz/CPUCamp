@@ -88,7 +88,7 @@ module top(
             .data_a (cpu_out_m),
             .data_b (16'b0),
             .wren_a (we),
-            .wren_b (16'b0),
+            .wren_b (~resetN),
             .q_a (rdata),
             .q_b (word_value)
         );
