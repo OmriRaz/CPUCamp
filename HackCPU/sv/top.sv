@@ -39,18 +39,26 @@ module top(
     localparam HEX_PIXELS_PER_WORD = DATA_WIDTH / BITS_PER_HEX_DIGIT * HEX_DIGIT_WIDTH;
 
     //PLL
-    logic cpu_clk;
+    logic cpu_clk; // The real clock driving the CPU.
+    logic cpu_clk_temp; // Same clock but before gating with `finished`.
 
 `ifdef USE_PLL
 
     pll #(.MULTIPLY(`PLL_MULTIPLY), .DIVIDE(`PLL_DIVIDE))
         pll_inst(
             .inclk0 ( CLK_50 ),
-            .c0 ( cpu_clk )
+            .c0 ( cpu_clk_temp )
         );
 `else
-    assign cpu_clk = CLK_50;
+    assign cpu_clk_temp = CLK_50;
 `endif
+
+    clkctrl clkctrl (
+                .inclk  (cpu_clk_temp),
+                .ena    (!finished),
+                .outclk (cpu_clk)
+            );
+
 
     //===
     logic [$clog2(RAM_REGISTER_COUNT)-1:0] ram_address;
@@ -172,7 +180,7 @@ module top(
 
 
     cpu cpu_inst (
-            .clk(cpu_clk && !finished),
+            .clk(cpu_clk),
             .SW(SW),
             .inst(instruction),
             .in_m(rdata),
