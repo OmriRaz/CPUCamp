@@ -4,10 +4,12 @@ import os
 
 # This script converts assembled hack files (lines of 16 bits each) to intel hex format.
 
+ROM_SIZE = 2**10
+INSTR_WIDTH = 16  # change to match the setting in top.sv
+
 CURR_DIR = os.path.dirname(os.path.realpath(__file__))
 DIR_HACK = os.path.join(CURR_DIR, "../hack")
 DIR_HEX = os.path.join(CURR_DIR, "../hex")
-ROM_SIZE = 2**12
 
 
 def main():
@@ -39,15 +41,19 @@ def hack_to_hex(FILE_HACK):
 
     ih = IntelHex16bit()
     ih.loadbin(FILE_BIN)
-    ih.write_hex_file(FILE_HEX_TEMP, byte_count=2)
+    ih.write_hex_file(FILE_HEX_TEMP, byte_count=INSTR_WIDTH//8)
 
     with open(FILE_HEX_TEMP, mode="r") as file_hex_temp, open(FILE_HEX, mode="w") as file_hex:
-
         for line in file_hex_temp:
             if line == ":00000001FF\n":  # eof
                 break
-            line = line[:3] + format(int(line[3:7], 16)//2,
-                                     'X').zfill(4) + line[7:]
+            line = line[:3] + \
+                format(int(line[3:7], 16)//(INSTR_WIDTH//8), 'X').zfill(4) + \
+                line[7:]
+            while len(line[7:-2]) < 2*INSTR_WIDTH//8:
+                line = line[:-3] + "0000" + "00\n"  # pad
+                # update byte count
+                line = ":" + format(INSTR_WIDTH//8, "X").zfill(2) + line[3:]
             # calculate checksum
             checksum = calc_checksum(line)
             line = line[:-3] + checksum + "\n"
@@ -58,7 +64,8 @@ def hack_to_hex(FILE_HACK):
     pad_size = ROM_SIZE - file_size
     with open(FILE_HEX, mode="a") as file_hex:
         for i in range(file_size, file_size+pad_size):
-            line = ":02" + format(i, "X").zfill(4) + "00" + "0000"
+            line = ":" + format(INSTR_WIDTH//8, "X").zfill(2) + format(i, "X").zfill(4) + \
+                "00" + "0"*(2*INSTR_WIDTH//8)
             line = line + calc_checksum(line) + "\n"
             file_hex.write(line)
 
@@ -77,7 +84,7 @@ def file_len(fname):
 
 def calc_checksum(line):
     checksum = 0
-    for i in range(1, len(line[1:13]), 2):
+    for i in range(1, len(line[1:len(line)-2]), 2):
         checksum += int(line[i:i+2], 16)
     checksum = format((~checksum + 1) % 256, 'X').zfill(2)
     return checksum

@@ -49,15 +49,18 @@ module ram (
         q_a,
         q_b);
 
-    input	[11:0]  address_a;
-    input	[11:0]  address_b;
+    parameter DATA_WIDTH;
+    parameter RAM_REGISTER_COUNT;
+
+    input	[$clog2(RAM_REGISTER_COUNT) - 1:0]  address_a;
+    input	[10 + (DATA_WIDTH/16 - 1) - 1:0]  address_b;
     input	  clock_a;
     input	  clock_b;
-    input	[15:0]  data_a;
+    input	[DATA_WIDTH-1:0]  data_a;
     input	[15:0]  data_b;
     input	  wren_a;
     input	  wren_b;
-    output	[15:0]  q_a;
+    output	[DATA_WIDTH-1:0]  q_a;
     output	[15:0]  q_b;
     `ifndef ALTERA_RESERVED_QIS
             // synopsys translate_off
@@ -69,9 +72,9 @@ module ram (
             // synopsys translate_on
 `endif
 
-            wire [15:0] sub_wire0;
+            wire [DATA_WIDTH-1:0] sub_wire0;
     wire [15:0] sub_wire1;
-    wire [15:0] q_a = sub_wire0[15:0];
+    wire [DATA_WIDTH-1:0] q_a = sub_wire0[DATA_WIDTH-1:0];
     wire [15:0] q_b = sub_wire1[15:0];
 
     altsyncram	altsyncram_component (
@@ -107,8 +110,8 @@ module ram (
         altsyncram_component.indata_reg_b = "CLOCK1",
         altsyncram_component.intended_device_family = "MAX 10",
         altsyncram_component.lpm_type = "altsyncram",
-        altsyncram_component.numwords_a = 4096,
-        altsyncram_component.numwords_b = 4096,
+        altsyncram_component.numwords_a = RAM_REGISTER_COUNT,
+        altsyncram_component.numwords_b = 2**(10 + DATA_WIDTH/16 - 1),
         altsyncram_component.operation_mode = "BIDIR_DUAL_PORT",
         altsyncram_component.outdata_aclr_a = "NONE",
         altsyncram_component.outdata_aclr_b = "NONE",
@@ -117,9 +120,9 @@ module ram (
         altsyncram_component.power_up_uninitialized = "FALSE",
         altsyncram_component.read_during_write_mode_port_a = "NEW_DATA_WITH_NBE_READ",
         altsyncram_component.read_during_write_mode_port_b = "NEW_DATA_WITH_NBE_READ",
-        altsyncram_component.widthad_a = 12,
-        altsyncram_component.widthad_b = 12,
-        altsyncram_component.width_a = 16,
+        altsyncram_component.widthad_a = $clog2(RAM_REGISTER_COUNT),
+        altsyncram_component.widthad_b = 10 + DATA_WIDTH/16 - 1,
+        altsyncram_component.width_a = DATA_WIDTH,
         altsyncram_component.width_b = 16,
         altsyncram_component.width_byteena_a = 1,
         altsyncram_component.width_byteena_b = 1,

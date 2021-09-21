@@ -42,9 +42,12 @@ module rom (
 	clock,
 	q);
 
-	input	[11:0]  address;
+    parameter INSTR_WIDTH;
+    parameter ROM_REGISTER_COUNT;
+
+	input	[$clog2(ROM_REGISTER_COUNT) - 1:0]  address;
 	input	  clock;
-	output	[15:0]  q;
+	output	[INSTR_WIDTH - 1:0]  q;
 `ifndef ALTERA_RESERVED_QIS
 // synopsys translate_off
 `endif
@@ -53,8 +56,8 @@ module rom (
 // synopsys translate_on
 `endif
 
-	wire [15:0] sub_wire0;
-	wire [15:0] q = sub_wire0[15:0];
+	wire [INSTR_WIDTH - 1:0] sub_wire0;
+	wire [INSTR_WIDTH - 1:0] q = sub_wire0[INSTR_WIDTH - 1:0];
 
 	altsyncram	altsyncram_component (
 				.address_a (address),
@@ -72,7 +75,7 @@ module rom (
 				.clocken1 (1'b1),
 				.clocken2 (1'b1),
 				.clocken3 (1'b1),
-				.data_a ({16{1'b1}}),
+				.data_a ({INSTR_WIDTH{1'b1}}),
 				.data_b (1'b1),
 				.eccstatus (),
 				.q_b (),
@@ -95,12 +98,12 @@ module rom (
 		altsyncram_component.intended_device_family = "MAX 10",
 		altsyncram_component.lpm_hint = "ENABLE_RUNTIME_MOD=YES,INSTANCE_NAME=ROM",
 		altsyncram_component.lpm_type = "altsyncram",
-		altsyncram_component.numwords_a = 4096,
+		altsyncram_component.numwords_a = ROM_REGISTER_COUNT,
 		altsyncram_component.operation_mode = "ROM",
 		altsyncram_component.outdata_aclr_a = "NONE",
 		altsyncram_component.outdata_reg_a = "UNREGISTERED",
-		altsyncram_component.widthad_a = 12,
-		altsyncram_component.width_a = 16,
+		altsyncram_component.widthad_a = $clog2(ROM_REGISTER_COUNT),
+		altsyncram_component.width_a = INSTR_WIDTH,
 		altsyncram_component.width_byteena_a = 1;
 
 

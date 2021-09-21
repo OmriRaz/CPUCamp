@@ -125,4 +125,7 @@ Your CPU will be tested by running a program similar to `mult_32.asm`. Put your 
 
 To speed things up, you may increase the clock frequency using a PLL. Open the `sv/definitions.sv` file and follow the instructions there.
 
+### Data and Address Widths
+You can set the `DATA_WIDTH` and `INSTR_WIDTH` in the top file to higher numbers to get wider memory access and potentially increase performance. If you do so, please also update `INSTR_WIDTH` in `hack_to_hex.py` and run it to generate the hex files appropriately.
 
+Also note that bigger widths are not fully tested yet, and may be buggy (especially the VGA display).
