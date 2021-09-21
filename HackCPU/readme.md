@@ -113,7 +113,11 @@ Remarks:
 
 Write your version of the CPU (and ALU) with the same functionality and interface, but better. Your CPU should execute the given program correctly and in as little clock cycles (50MHz) as possible.
 
-You may overwrite **only** the `sv/alu.sv` and `sv/cpu.sv` files, and the PLL settings in `sv/definitions.sv`.
+You may rewrite anything, including the `sv/alu.sv`, `sv/ram.sv`, `sv/rom.sv` and `sv/cpu.sv` files, and the PLL settings in `sv/definitions.sv`.
+The limitations are:
+1. Don’t touch the checking Verilog and its clock.
+2. Don’t change the code sequence (it can go wider, but not changed).
+3. Keep the VGA functioning the same.
 
 Your CPU will be tested by running a program similar to `mult_32.asm`. Put your ID in the begining of both the `asm` file and in the python script at `python/mult32_2`. Convert the `asm` file to `hex` and then run the program on the CPU (as explained above). The first line on the screen should match the first line in the script output. The next non-zero line is your id in hex (which the script will show you as well).
 
