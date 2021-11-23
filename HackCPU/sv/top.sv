@@ -189,10 +189,9 @@ module top(
         );
 
 
-    cpu #(.INSTR_WIDTH(INSTR_WIDTH),
-          .DATA_WIDTH(DATA_WIDTH))
-        cpu_inst (
+    cpu cpu_inst (
             .clk(cpu_clk),
+            .SW(SW),
             .inst(instruction),
             .in_m(rdata),
             .resetN(resetN),
