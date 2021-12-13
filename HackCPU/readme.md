@@ -19,6 +19,12 @@ Another option is to compile it from the code in this directory:
 
 After programming the device, you'll see on the screen the first few words of the data memory, in binary and in hex. In the bottom of the screen you'll see a clock count (50MHz) in hex, and time count in hundreths of a second.
 
+The program loaded out of the box on the DE10-Lite is `mult32_2`. The python script by the same name outputs the first line of the expected memory, and the id in hex, which is in the next non-zero line in memory.
+By default, the id is 12345678, and the expected output is:
+```
+0xb7b 0x285b
+0x4d2, 0x162e
+```
 Note: The Kiwi will start with no program. You need to program it at runtime, which is explained below.
 
 ### Seven Segment Display
